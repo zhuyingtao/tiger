@@ -26,7 +26,7 @@ public class Tiger {
 //		}
 
 		
-		String fname="test/TreeVisitor.java";
+		String fname="monster/Monster.java";
 		// /////////////////////////////////////////////////////
 		// it would be helpful to be able to test the lexer
 		// independently.

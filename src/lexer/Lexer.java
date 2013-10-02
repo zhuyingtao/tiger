@@ -38,7 +38,7 @@ public class Lexer {
 			this.posChange(c);
 			c = this.fstream.read();
 		}
-		
+
 		if (-1 == c)
 			return new Token(Kind.TOKEN_EOF, lineNum, colNum++);
 
@@ -81,6 +81,10 @@ public class Lexer {
 				return new Token(Kind.TOKEN_ADD, lineNum, colNum++);
 			else {
 				// error
+				System.out.println("No Such Token: " + c + " at line "
+						+ lineNum + " , column " + colNum);
+				System.exit(0);
+				
 			}
 
 		default:
