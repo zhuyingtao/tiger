@@ -18,8 +18,9 @@ public class Tiger {
 
 		// ///////////////////////////////////////////////////////
 		// handle command line arguments
-		CommandLine cmd = new CommandLine();
-		String fname = cmd.scan(args);
+//		CommandLine cmd = new CommandLine();
+//		String fname = cmd.scan(args);
+		String fname ="test/Fac.java";
 
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
@@ -28,15 +29,16 @@ public class Tiger {
 					.println("Testing the Tiger compiler on Fac.java starting:");
 			ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
 			ast.Fac.prog.accept(pp);
+			ast.Fac.prog1.accept(pp);/******** My code********/
 			System.out
 					.println("Testing the Tiger compiler on Fac.java finished.");
 			System.exit(1);
 		}
 
-		if (fname == null) {
-			cmd.usage();
-			return;
-		}
+//		if (fname == null) {
+//			cmd.usage();
+//			return;
+//		}
 
 		// /////////////////////////////////////////////////////
 		// it would be helpful to be able to test the lexer
