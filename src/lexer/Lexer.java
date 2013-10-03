@@ -84,7 +84,6 @@ public class Lexer {
 				System.out.println("No Such Token: " + c + " at line "
 						+ lineNum + " , column " + colNum);
 				System.exit(0);
-				
 			}
 
 		default:
