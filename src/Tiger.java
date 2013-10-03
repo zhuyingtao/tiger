@@ -18,9 +18,9 @@ public class Tiger {
 
 		// ///////////////////////////////////////////////////////
 		// handle command line arguments
-//		CommandLine cmd = new CommandLine();
-//		String fname = cmd.scan(args);
-		String fname ="test/Fac.java";
+		// CommandLine cmd = new CommandLine();
+		// String fname = cmd.scan(args);
+		String fname = "test/TreeVisitor.java";
 
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
@@ -29,16 +29,16 @@ public class Tiger {
 					.println("Testing the Tiger compiler on Fac.java starting:");
 			ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
 			ast.Fac.prog.accept(pp);
-			ast.Fac.prog1.accept(pp);/******** My code********/
+			ast.Fac.prog1.accept(pp);/******** My add ********/
 			System.out
 					.println("Testing the Tiger compiler on Fac.java finished.");
 			System.exit(1);
 		}
 
-//		if (fname == null) {
-//			cmd.usage();
-//			return;
-//		}
+		// if (fname == null) {
+		// cmd.usage();
+		// return;
+		// }
 
 		// /////////////////////////////////////////////////////
 		// it would be helpful to be able to test the lexer
@@ -84,8 +84,9 @@ public class Tiger {
 		}
 
 		// elaborate the AST, report all possible errors.
-		elaborator.ElaboratorVisitor elab = new elaborator.ElaboratorVisitor();
-		theAst.accept(elab);
+		// elaborator.ElaboratorVisitor elab = new
+		// elaborator.ElaboratorVisitor();
+		// theAst.accept(elab);
 
 		return;
 	}
