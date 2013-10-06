@@ -20,7 +20,7 @@ public class Tiger {
 		// handle command line arguments
 		// CommandLine cmd = new CommandLine();
 		// String fname = cmd.scan(args);
-		String fname = "test/TreeVisitor.java";
+		String fname = "test/BubbleSort.java";
 
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
@@ -84,9 +84,8 @@ public class Tiger {
 		}
 
 		// elaborate the AST, report all possible errors.
-		// elaborator.ElaboratorVisitor elab = new
-		// elaborator.ElaboratorVisitor();
-		// theAst.accept(elab);
+		elaborator.ElaboratorVisitor elab = new elaborator.ElaboratorVisitor();
+		theAst.accept(elab);
 
 		return;
 	}

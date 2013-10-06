@@ -9,9 +9,9 @@ public class Control {
 	public static boolean lex = false;
 
 	// ast
-	public static boolean dumpAst = true;
+	public static boolean dumpAst = false;
 
 	// elaborator
-	public static boolean elabClassTable = false;
-	public static boolean elabMethodTable = false;
+	public static boolean elabClassTable = true;
+	public static boolean elabMethodTable = true;
 }
