@@ -1,14 +1,11 @@
 package lexer;
 
 import java.io.InputStream;
-
-import util.Todo;
 import lexer.Token.Kind;
 
 public class Lexer {
-	String fname; // the input file name to be compiled
+	public String fname; // the input file name to be compiled
 	InputStream fstream; // input stream for the above file
-
 	int lineNum = 1;
 	int colNum = 1;
 
@@ -21,6 +18,17 @@ public class Lexer {
 			"int", "length", "main", "new", "out", "println", "public",
 			"return", "static", "String", "System", "this", "true", "void",
 			"while" };
+
+	public void posChange(int c) {
+		if (c == '\t')
+			colNum += 4;
+		else if ((c != '\n') && (c != '\r'))
+			colNum++;
+		else if (c == '\n') {
+			lineNum++;
+			colNum = 1;
+		}
+	}
 
 	// When called, return the next token (refer to the code "Token.java")
 	// from the input stream.
@@ -77,15 +85,18 @@ public class Lexer {
 			return new Token(Kind.TOKEN_TIMES, lineNum, colNum++);
 		case '&':
 			c = this.fstream.read();
-			if (c == '&')
-				return new Token(Kind.TOKEN_ADD, lineNum, colNum++);
-			else {
+			if (c == '&') {
+				int sColNum = colNum;
+				colNum += 2;
+				return new Token(Kind.TOKEN_AND, lineNum, sColNum);
+			} else {
 				// error
-				System.out.println("No Such Token: " + c + " at line "
-						+ lineNum + " , column " + colNum);
-				System.exit(0);
+				String errInfo = "Lexical Error : invalid operator '&' , '&&' is expected";
+				String posInfo = " --- at line " + lineNum + " , column "
+						+ colNum + " , " + fname;
+				System.err.println(errInfo + posInfo);
+				return this.nextTokenInternal();
 			}
-
 		default:
 			// Lab 1, exercise 2: supply missing code to
 			// lex other kinds of tokens.
@@ -161,9 +172,10 @@ public class Lexer {
 					return this.nextTokenInternal();
 				}
 			}
-
-			new Todo();
-			return null;
+			System.err.println("Lexical Error : invalid identifier : " + s
+					+ " --- at line " + lineNum + " , column " + (colNum++)
+					+ " , " + fname);
+			return this.nextTokenInternal();
 		}
 	}
 
@@ -179,16 +191,5 @@ public class Lexer {
 		if (control.Control.lex)
 			System.out.println(t.toString());
 		return t;
-	}
-
-	public void posChange(int c) {
-		if (c == '\t')
-			colNum += 4;
-		else if ((c != '\n') && (c != '\r'))
-			colNum++;
-		else if (c == '\n') {
-			lineNum++;
-			colNum = 1;
-		}
 	}
 }

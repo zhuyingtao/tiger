@@ -8,8 +8,8 @@ public class Parser {
 	Lexer lexer;
 	Token current;
 
-	String syntax;
-	String preSyntax;
+	// String syntax;
+	// String preSyntax;
 
 	public Parser(String fname, java.io.InputStream fstream) {
 		lexer = new Lexer(fname, fstream);
@@ -28,21 +28,24 @@ public class Parser {
 		if (kind == current.kind)
 			advance();
 		else {
-			System.out.println("Expects: " + kind.toString());
-			System.out
-					.println("But got: "
-							+ current.kind.toString()
-							+ (current.kind == Token.Kind.TOKEN_ID ? (": " + current.lexeme)
-									: "") + current.printPos()
-							+ "  , Syntax : " + preSyntax + " --> " + syntax);
+			System.err.println("Syntax Error: expects: " + kind.toString()
+					+ " , ");
+			String errKind = current.kind.toString()
+					+ (current.kind == Token.Kind.TOKEN_ID ? (": " + current.lexeme)
+							: "");
+			String errPos = " ---" + current.printPos() + " , " + lexer.fname;
+			System.err.println("but got: " + errKind + errPos);
 			System.exit(1);
 		}
 	}
 
 	private void error() {
-		System.out.println("Syntax error: compilation aborting..."
-				+ current.kind.toString() + "  " + this.syntax + "-->"
-				+ current.printPos());
+		String errKind = current.kind.toString()
+				+ (current.kind == Token.Kind.TOKEN_ID ? (": " + current.lexeme)
+						: "");
+		String errPos = " ---" + current.printPos() + " , " + lexer.fname;
+		System.out.println("Syntax Error: compilation aborting..." + errKind
+				+ errPos);
 		System.exit(1);
 		return;
 	}
@@ -57,8 +60,6 @@ public class Parser {
 	// ->
 	// ExpRest -> , Exp
 	private void parseExpList() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseExpList";
 		if (current.kind == Kind.TOKEN_RPAREN)
 			return;
 		parseExp();
@@ -78,8 +79,6 @@ public class Parser {
 	// -> new int [exp]
 	// -> new id ()
 	private void parseAtomExp() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseAtomExp";
 		switch (current.kind) {
 		case TOKEN_LPAREN:
 			advance();
@@ -131,8 +130,6 @@ public class Parser {
 	// -> AtomExp [exp]
 	// -> AtomExp .length
 	private void parseNotExp() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseNotExp";
 		parseAtomExp();
 		while (current.kind == Kind.TOKEN_DOT
 				|| current.kind == Kind.TOKEN_LBRACK) {
@@ -158,8 +155,6 @@ public class Parser {
 	// TimesExp -> ! TimesExp
 	// -> NotExp
 	private void parseTimesExp() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseTimesExp";
 		while (current.kind == Kind.TOKEN_NOT) {
 			advance();
 		}
@@ -170,8 +165,6 @@ public class Parser {
 	// AddSubExp -> TimesExp * TimesExp
 	// -> TimesExp
 	private void parseAddSubExp() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseAddSubExp";
 		parseTimesExp();
 		while (current.kind == Kind.TOKEN_TIMES) {
 			advance();
@@ -184,8 +177,6 @@ public class Parser {
 	// -> AddSubExp - AddSubExp
 	// -> AddSubExp
 	private void parseLtExp() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseLtExp";
 		parseAddSubExp();
 		while (current.kind == Kind.TOKEN_ADD || current.kind == Kind.TOKEN_SUB) {
 			advance();
@@ -197,8 +188,6 @@ public class Parser {
 	// AndExp -> LtExp < LtExp
 	// -> LtExp
 	private void parseAndExp() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseAndExp";
 		parseLtExp();
 		while (current.kind == Kind.TOKEN_LT) {
 			advance();
@@ -210,8 +199,6 @@ public class Parser {
 	// Exp -> AndExp && AndExp
 	// -> AndExp
 	private void parseExp() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseExp";
 		parseAndExp();
 		while (current.kind == Kind.TOKEN_AND) {
 			advance();
@@ -226,17 +213,16 @@ public class Parser {
 	// -> System.out.println ( Exp ) ;
 	// -> id = Exp ;
 	// -> id [ Exp ]= Exp ;
-	boolean comeFromVarDecls = false;// define this var to judge whether this is
 
-	// first time entering the Statement part or not
-	// base on it,we can distinguish the token "id"
+	boolean comeFromVarDecls = false;// define this var to judge whether this
+										// statement is after the VarDecls or
+										// not,base on it,we can distinguish the
+										// token "id"
 
 	private void parseStatement() {
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a statement.
 		/************ My Code *****************/
-		this.preSyntax = this.syntax;
-		this.syntax = "parseStatement";
 		switch (current.kind) {
 		case TOKEN_LBRACE:
 			eatToken(Kind.TOKEN_LBRACE);
@@ -272,6 +258,8 @@ public class Parser {
 			break;
 		case TOKEN_ID:
 			if (comeFromVarDecls) {
+				// if this is true , that means we have advanced the next token,
+				// so we can't advance again!
 				current = idAfter;
 				comeFromVarDecls = false;
 			} else {
@@ -294,8 +282,6 @@ public class Parser {
 	// Statements -> Statement Statements
 	// ->
 	private void parseStatements() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseStatements";
 		while (current.kind == Kind.TOKEN_LBRACE
 				|| current.kind == Kind.TOKEN_IF
 				|| current.kind == Kind.TOKEN_WHILE
@@ -311,14 +297,13 @@ public class Parser {
 	// -> int
 	// -> id
 	Token idAfter;
-	boolean comeFromVar = false;
+	boolean comeFromVarDecls2 = false;// define this var to distinguish whether
+										// we have advance the next token or not
 
 	private void parseType() {
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a type.
 		/************** My Code ****************/
-		this.preSyntax = this.syntax;
-		this.syntax = "parseType";
 		switch (current.kind) {
 		case TOKEN_INT:
 			eatToken(Kind.TOKEN_INT);
@@ -331,9 +316,9 @@ public class Parser {
 			eatToken(Kind.TOKEN_BOOLEAN);
 			break;
 		case TOKEN_ID:
-			if (comeFromVar) {
+			if (comeFromVarDecls2) {
 				current = idAfter;
-				comeFromVar = false;
+				comeFromVarDecls2 = false;
 			} else
 				eatToken(Kind.TOKEN_ID);
 			break;
@@ -347,8 +332,6 @@ public class Parser {
 	private void parseVarDecl() {
 		// to parse the "Type" nonterminal in this method, instead of writing
 		// a fresh one.
-		this.preSyntax = this.syntax;
-		this.syntax = "parseVarDecl";
 		parseType();
 		eatToken(Kind.TOKEN_ID);
 		eatToken(Kind.TOKEN_SEMI);
@@ -359,8 +342,6 @@ public class Parser {
 	// ->
 
 	private void parseVarDecls() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseVarDecls";
 		// VarDecl* and Statement* can both start with "id",so it is ambiguous.
 		// To distinguish,we can read the next token.
 		while (current.kind == Kind.TOKEN_INT
@@ -371,10 +352,11 @@ public class Parser {
 				if (idAfter.kind == Kind.TOKEN_ASSIGN
 						|| idAfter.kind == Kind.TOKEN_LBRACK) {
 					comeFromVarDecls = true;
+					// if this is true,that means the VarDecls have been over,
+					// so we exit the cycle
 					break;
 				}
-				comeFromVar = true;
-				comeFromVarDecls = true;
+				comeFromVarDecls2 = true;
 			}
 			parseVarDecl();
 		}
@@ -385,8 +367,6 @@ public class Parser {
 	// ->
 	// FormalRest -> , Type id
 	private void parseFormalList() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseFormalList";
 		if (current.kind == Kind.TOKEN_INT
 				|| current.kind == Kind.TOKEN_BOOLEAN
 				|| current.kind == Kind.TOKEN_ID) {
@@ -407,8 +387,6 @@ public class Parser {
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a method.
 		/************** My Code ****************/
-		this.preSyntax = this.syntax;
-		this.syntax = "parseMethod";
 		this.comeFromVarDecls = false;
 		eatToken(Kind.TOKEN_PUBLIC);
 		this.parseType();
@@ -429,8 +407,6 @@ public class Parser {
 	// MethodDecls -> MethodDecl MethodDecls
 	// ->
 	private void parseMethodDecls() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseMethodDecls";
 		while (current.kind == Kind.TOKEN_PUBLIC) {
 			parseMethod();
 		}
@@ -440,8 +416,6 @@ public class Parser {
 	// ClassDecl -> class id { VarDecl* MethodDecl* }
 	// -> class id extends id { VarDecl* MethodDecl* }
 	private void parseClassDecl() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseClassDecl";
 		eatToken(Kind.TOKEN_CLASS);
 		eatToken(Kind.TOKEN_ID);
 		if (current.kind == Kind.TOKEN_EXTENDS) {
@@ -458,8 +432,6 @@ public class Parser {
 	// ClassDecls -> ClassDecl ClassDecls
 	// ->
 	private void parseClassDecls() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseClassDecls";
 		while (current.kind == Kind.TOKEN_CLASS) {
 			parseClassDecl();
 		}
@@ -478,8 +450,6 @@ public class Parser {
 		// to parse a main class as described by the
 		// grammar above.
 		/**************** My Code ******************/
-		this.preSyntax = this.syntax;
-		this.syntax = "parseMainClass";
 		eatToken(Kind.TOKEN_CLASS);
 		eatToken(Kind.TOKEN_ID);
 		eatToken(Kind.TOKEN_LBRACE);
@@ -503,8 +473,6 @@ public class Parser {
 
 	// Program -> MainClass ClassDecl*
 	private void parseProgram() {
-		this.preSyntax = this.syntax;
-		this.syntax = "parseProgram";
 		parseMainClass();
 		parseClassDecls();
 		eatToken(Kind.TOKEN_EOF);

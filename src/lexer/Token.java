@@ -53,7 +53,6 @@ public class Token {
 		TOKEN_TRUE, // "true"
 		TOKEN_VOID, // "void"
 		TOKEN_WHILE, // "while"
-
 	}
 
 	class Position {
@@ -63,8 +62,8 @@ public class Token {
 
 	public Kind kind; // kind of the token
 	public String lexeme; // extra lexeme for this token, if any
-	public Position pos=new Position(); // on which line of the source file this token
-							// appears
+	public Position pos = new Position(); // the exact position of the source file
+											// this token appears
 
 	// Some tokens don't come with lexeme but
 	// others do.
@@ -92,8 +91,8 @@ public class Token {
 				+ this.pos.colNum.toString();
 		return this.kind.toString() + s;
 	}
-	
-	public String printPos(){
-		return "   at line "+this.pos.lineNum+" , column "+this.pos.colNum;
+
+	public String printPos() {
+		return " at line " + this.pos.lineNum + " , column " + this.pos.colNum;
 	}
 }

@@ -17,16 +17,16 @@ public class Tiger {
 
 		// ///////////////////////////////////////////////////////
 		// handle command line arguments
-//		CommandLine cmd = new CommandLine();
-//		String fname = cmd.scan(args);
-//		
-//		if (fname == null) {
-//			cmd.usage();
-//			return;
-//		}
+		CommandLine cmd = new CommandLine();
+		String fname = cmd.scan(args);
+		
+		if (fname == null) {
+			cmd.usage();
+			return;
+		}
 
 		
-		String fname="monster/Monster.java";
+//		String fname="test/Sum.java";
 		// /////////////////////////////////////////////////////
 		// it would be helpful to be able to test the lexer
 		// independently.
