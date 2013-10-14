@@ -20,8 +20,8 @@ public class Tiger {
 		// handle command line arguments
 		// CommandLine cmd = new CommandLine();
 		// String fname = cmd.scan(args);
-		String fname = "test/BubbleSort.java";
 
+		String fname = "test/MyTest.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -29,9 +29,9 @@ public class Tiger {
 					.println("Testing the Tiger compiler on Fac.java starting:");
 			ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
 			ast.Fac.prog.accept(pp);
-			ast.Fac.prog1.accept(pp);/******** My add ********/
-			System.out
-					.println("Testing the Tiger compiler on Fac.java finished.");
+			ast.Fac.prog1.accept(pp);// My add
+			System.out.println("Testing the Tiger compiler on"
+					+ " Fac.java && Sum.java finished.");
 			System.exit(1);
 		}
 

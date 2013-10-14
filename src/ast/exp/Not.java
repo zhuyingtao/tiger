@@ -3,10 +3,18 @@ package ast.exp;
 public class Not extends T
 {
   public T exp;
+  
+  public int lineNum;
 
   public Not(T exp)
   {
     this.exp = exp;
+  }
+  
+  public Not(T exp,int lineNum)
+  {
+    this.exp = exp;
+    this.lineNum=lineNum;
   }
 
   @Override

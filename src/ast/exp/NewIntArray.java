@@ -2,11 +2,19 @@ package ast.exp;
 
 public class NewIntArray extends T
 {
-  public T exp;
+  public T exp; 
+  
+  public int lineNum;
 
   public NewIntArray(T exp)
   {
     this.exp = exp;
+  }
+  
+  public NewIntArray(T exp,int lineNum)
+  {
+    this.exp = exp;
+    this.lineNum=lineNum;
   }
 
   @Override

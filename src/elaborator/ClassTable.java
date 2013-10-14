@@ -2,7 +2,6 @@ package elaborator;
 
 import java.util.Enumeration;
 
-
 public class ClassTable {
 	// map each class name (a string), to the class bindings.
 	private java.util.Hashtable<String, ClassBinding> table;
@@ -47,6 +46,7 @@ public class ClassTable {
 	public ast.type.T get(String className, String xid) {
 		ClassBinding cb = this.table.get(className);
 		ast.type.T type = cb.fields.get(xid);
+		cb.isUsed.put(xid, true); // xid has been used
 		while (type == null) { // search all parent classes until found or fail
 			if (cb.extendss == null)
 				return type;
@@ -82,13 +82,27 @@ public class ClassTable {
 			System.out.println(classes.nextElement().toString());
 			i++;
 		}
-		System.out.println("=============Class Table End===============");
+		System.out.println("=============Class Table End===============\n");
 		// this.table.toString();
-		
+
 	}
 
 	@Override
 	public String toString() {
 		return this.table.toString();
+	}
+
+	public void isFieldUsed(String className) {
+		ClassBinding cb = this.table.get(className);
+		Enumeration<String> id = cb.isUsed.keys();
+		Enumeration<Boolean> use = cb.isUsed.elements();
+		while (id.hasMoreElements()) {
+			String nowId = id.nextElement();
+			boolean nowUse = use.nextElement();
+			if (!nowUse)
+				System.out.println("Warning: the field ' " + nowId
+						+ " ' is never used ! ---- in Class " + className
+						+ " ;");
+		}
 	}
 }

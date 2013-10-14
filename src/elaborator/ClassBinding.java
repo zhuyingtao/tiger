@@ -1,14 +1,18 @@
 package elaborator;
 
+
 public class ClassBinding {
 	public String extendss; // null for non-existing extends
 	public java.util.Hashtable<String, ast.type.T> fields;
 	public java.util.Hashtable<String, MethodType> methods;
+	public java.util.Hashtable<String, Boolean> isUsed; // whether the fields
+														// have been used
 
 	public ClassBinding(String extendss) {
 		this.extendss = extendss;
 		this.fields = new java.util.Hashtable<String, ast.type.T>();
 		this.methods = new java.util.Hashtable<String, MethodType>();
+		this.isUsed=new java.util.Hashtable<String, Boolean>();
 	}
 
 	public ClassBinding(String extendss,
@@ -25,6 +29,7 @@ public class ClassBinding {
 			System.exit(1);
 		}
 		this.fields.put(xid, type);
+		this.isUsed.put(xid, false);
 	}
 
 	public void put(String mid, MethodType mt) {

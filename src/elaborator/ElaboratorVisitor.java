@@ -1,29 +1,17 @@
 package elaborator;
 
-import java.util.LinkedList;
-
-import ast.type.Boolean;
-
 public class ElaboratorVisitor implements ast.Visitor {
 	public ClassTable classTable; // symbol table for class
 	public MethodTable methodTable; // symbol table for each method
 	public String currentClass; // the class name being elaborated
 	public ast.type.T type; // type of the expression being elaborated
 
-	public LinkedList<MethodTable> methodTables;
-
 	public ElaboratorVisitor() {
 		this.classTable = new ClassTable();
-		this.methodTables = new LinkedList<>();
-		// this.methodTable = new MethodTable();
+		this.methodTable = new MethodTable();
 		this.currentClass = null;
 		this.type = null;
 
-	}
-
-	private void error() {
-		System.out.println("type mismatch");
-		System.exit(1);
 	}
 
 	private void error(String error) {
@@ -32,9 +20,13 @@ public class ElaboratorVisitor implements ast.Visitor {
 			System.out.println("The ID has not been declared!");
 
 			break;
+		case "NotSame":
+			System.out.println("The type of the expression"
+					+ " between the binary operator must be same!");
+			System.out.println("---- at ");
 
 		default:
-			break;
+			System.out.println(error);
 		}
 		System.exit(1);
 	}
@@ -47,7 +39,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
 		if (!leftty.toString().equals(this.type.toString()))
-			error();
+			error("NotSame");
 		this.type = new ast.type.Int();
 	}
 
@@ -57,7 +49,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
 		if (!leftty.toString().equals(this.type.toString()))
-			error();
+			error("and");
 		this.type = new ast.type.Boolean();
 	}
 
@@ -65,10 +57,12 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.exp.ArraySelect e) {
 		e.index.accept(this);
 		if (!this.type.toString().equals("@int"))
-			error();
+			error("as1");
+		//
+		// check index
 		e.array.accept(this);
 		if (!this.type.toString().equals("@int[]"))
-			error();
+			error("as2");
 		this.type = new ast.type.Int();
 	}
 
@@ -83,7 +77,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 			ty = (ast.type.Class) leftty;
 			e.type = ty.id; // the class name
 		} else
-			error();
+			error("call1");
 		// get the args type of this method in classTable
 		MethodType mty = this.classTable.getm(ty.id, e.id);
 		// get the args type of this method being called
@@ -96,13 +90,34 @@ public class ElaboratorVisitor implements ast.Visitor {
 		}
 		// contrast them
 		if (mty.argsType.size() != argsty.size())
-			error();
+			error("call2");
+
+		// Bug : such as "Visitor : MyVisitor(extends Visitor)" don't match
 		for (int i = 0; i < argsty.size(); i++) {
 			ast.dec.Dec dec = (ast.dec.Dec) mty.argsType.get(i);
+			// System.out.println(dec.type + ":" + argsty.get(i));
+
 			if (dec.type.toString().equals(argsty.get(i).toString()))
 				;
-			else
-				error();
+			else {
+				if (argsty.get(i) instanceof ast.type.Class) {
+					ClassBinding cb = this.classTable.get(argsty.get(i)
+							.toString());
+					boolean matches = false;
+					while (cb.extendss != null) {
+						if (dec.type.toString().equals(cb.extendss)) {
+							matches = true;
+							break;
+						} else
+							cb = this.classTable.get(cb.extendss);
+					}
+					if (!matches)
+						error("call4");
+				} else {
+					error("call3--->" + dec.type + "," + dec.id + "\n "
+							+ this.currentClass + "." + e.id.toString());
+				}
+			}
 		}
 
 		this.type = mty.retType;
@@ -128,7 +143,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 			e.isField = true;
 		}
 		if (type == null)
-			error();
+			error("id1");
 		this.type = type;
 		// record this type on this node for future use.
 		e.type = type;
@@ -139,7 +154,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.exp.Length e) {
 		e.array.accept(this);
 		if (!this.type.toString().equals("@int[]"))
-			error();
+			error("length");
 		this.type = new ast.type.Int();
 	}
 
@@ -149,7 +164,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		ast.type.T ty = this.type;
 		e.right.accept(this);
 		if (!this.type.toString().equals(ty.toString()))
-			error();
+			error("lt");
 		this.type = new ast.type.Boolean();
 		return;
 	}
@@ -158,7 +173,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.exp.NewIntArray e) {
 		e.exp.accept(this);
 		if (!this.type.toString().equals("@int"))
-			error();
+			error("nia");
 		this.type = new ast.type.IntArray();
 	}
 
@@ -172,7 +187,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.exp.Not e) {
 		e.exp.accept(this);
 		if (!this.type.toString().equals("@boolean"))
-			error();
+			error("not");
 		this.type = new ast.type.Boolean();
 	}
 
@@ -188,7 +203,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
 		if (!this.type.toString().equals(leftty.toString()))
-			error();
+			error("sub");
 		this.type = new ast.type.Int();
 		return;
 	}
@@ -204,8 +219,8 @@ public class ElaboratorVisitor implements ast.Visitor {
 		e.left.accept(this);
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
-		if (!this.type.toString().equals(leftty.toString()))
-			error();
+		if (!this.type.toString().equals(leftty.toString()))// must int??
+			error("times");
 		this.type = new ast.type.Int();
 		return;
 	}
@@ -225,17 +240,28 @@ public class ElaboratorVisitor implements ast.Visitor {
 			type = this.classTable.get(this.currentClass, s.id);
 		// if search failed, then s.id must have not been declared
 		if (type == null)
-			error("Not Declared");
+			error("assign1");
 		s.exp.accept(this);
-		s.type = type; // is it useful?
+		s.type = type; // not this.type ,this.type now is the exp type
 		if (!this.type.toString().equals(type.toString()))
-			error();
+			error("assign2");
 		return;
 	}
 
 	@Override
 	public void visit(ast.stm.AssignArray s) {
 		ast.type.T type = this.methodTable.get(s.id);
+		if (type == null)
+			type = this.classTable.get(this.currentClass, s.id);
+		if (type == null)
+			error("assignarray1");
+		//
+		// Is it necessary to check whether the index out of bounds now?
+		s.exp.accept(this);
+		if (!this.type.toString().equals("@int"))// only support int[]
+			error("assignarray2");
+		return;
+
 	}
 
 	@Override
@@ -249,7 +275,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.stm.If s) {
 		s.condition.accept(this);
 		if (!this.type.toString().equals("@boolean"))
-			error();
+			error("if");
 		s.thenn.accept(this);
 		s.elsee.accept(this);
 		return;
@@ -259,7 +285,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.stm.Print s) {
 		s.exp.accept(this);
 		if (!this.type.toString().equals("@int"))
-			error();
+			error("print");
 		return;
 	}
 
@@ -267,15 +293,16 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.stm.While s) {
 		s.condition.accept(this);
 		if (!this.type.toString().equals("@boolean"))
-			error();
+			error("while");
 		s.body.accept(this);
 	}
 
 	// type not use now
 	int boo = 0;
-	int cla=0;
-	int inte=0;
-	int arr=0;
+	int cla = 0;
+	int inte = 0;
+	int arr = 0;
+
 	@Override
 	public void visit(ast.type.Boolean t) {
 		System.out.println("boolean@" + boo++);
@@ -298,6 +325,8 @@ public class ElaboratorVisitor implements ast.Visitor {
 
 	// dec
 	@Override
+	// Because when we build the classTable and the methodTable,we have checked
+	// the validity of the vars,so we don't need to check again!
 	public void visit(ast.dec.Dec d) {
 	}
 
@@ -305,9 +334,13 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.method.Method m) {
 		// construct the method table
-		this.methodTable = new MethodTable();
+		this.methodTable = new MethodTable();// methodTable don't need to be
+												// stored!so we don't need to
+												// make a Linkedlist
+		// Up to now,I have just known that in Java a field and a local
+		// variable can have a same name,so we don't need to check the local
+		// variable's name here!
 		this.methodTable.put(m.formals, m.locals, m.id);
-		this.methodTables.add(this.methodTable);
 
 		if (control.Control.elabMethodTable)
 			this.methodTable.dump();
@@ -315,6 +348,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 		for (ast.stm.T s : m.stms)
 			s.accept(this);
 		m.retExp.accept(this);
+
+		// check whether all the local variable have been used
+		this.methodTable.isVariableUsed();
 		return;
 	}
 
@@ -326,6 +362,10 @@ public class ElaboratorVisitor implements ast.Visitor {
 		for (ast.method.T m : c.methods) {
 			m.accept(this);
 		}
+
+		// check whether all the fields have been used
+		this.classTable.isFieldUsed(this.currentClass);
+
 		return;
 	}
 
