@@ -3,8 +3,6 @@ package ast.exp;
 public class Not extends T
 {
   public T exp;
-  
-  public int lineNum;
 
   public Not(T exp)
   {

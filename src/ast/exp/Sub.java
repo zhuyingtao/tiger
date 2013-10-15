@@ -4,8 +4,6 @@ public class Sub extends T {
 	public T left;
 	public T right;
 
-	public int lineNum;
-
 	public Sub(T left, T right) {
 		this.left = left;
 		this.right = right;

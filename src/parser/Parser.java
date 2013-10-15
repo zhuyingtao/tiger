@@ -90,20 +90,21 @@ public class Parser {
 			eatToken(Kind.TOKEN_RPAREN);
 			return exp;
 		case TOKEN_NUM:
-			ast.exp.Num num = new ast.exp.Num(Integer.parseInt(current.lexeme));
+			ast.exp.Num num = new ast.exp.Num(Integer.parseInt(current.lexeme),
+					current.getLineNum());
 			advance();
 			return num;
 		case TOKEN_TRUE:
 			advance();
-			return new ast.exp.True();
+			return new ast.exp.True(current.getLineNum());
 		case TOKEN_FALSE: // My add
 			advance();
-			return new ast.exp.False();
+			return new ast.exp.False(current.getLineNum());
 		case TOKEN_THIS:
 			advance();
-			return new ast.exp.This();
+			return new ast.exp.This(current.getLineNum());
 		case TOKEN_ID:
-			ast.exp.Id id = new ast.exp.Id(current.lexeme);
+			ast.exp.Id id = new ast.exp.Id(current.lexeme, current.getLineNum());
 			advance();
 			return id;
 		case TOKEN_NEW: {
@@ -116,7 +117,8 @@ public class Parser {
 				eatToken(Kind.TOKEN_RBRACK);
 				return new ast.exp.NewIntArray(exp1, current.getLineNum());
 			case TOKEN_ID:
-				ast.exp.NewObject no = new ast.exp.NewObject(current.lexeme);
+				ast.exp.NewObject no = new ast.exp.NewObject(current.lexeme,
+						current.getLineNum());
 				advance();
 				eatToken(Kind.TOKEN_LPAREN);
 				eatToken(Kind.TOKEN_RPAREN);
@@ -144,21 +146,21 @@ public class Parser {
 			if (current.kind == Kind.TOKEN_DOT) {
 				advance();
 				if (current.kind == Kind.TOKEN_LENGTH) {
+					exp = new ast.exp.Length(exp, current.getLineNum());
 					advance();
-					exp = new ast.exp.Length(exp);
 				} else {
 					String id = current.lexeme;
 					eatToken(Kind.TOKEN_ID);
 					eatToken(Kind.TOKEN_LPAREN);
 					LinkedList<ast.exp.T> args = parseExpList();
 					eatToken(Kind.TOKEN_RPAREN);
-					exp = new ast.exp.Call(exp, id, args);
+					exp = new ast.exp.Call(exp, id, args, current.getLineNum());
 				}
 			} else {
 				advance();
 				ast.exp.T exp1 = parseExp();
 				eatToken(Kind.TOKEN_RBRACK);
-				exp = new ast.exp.ArraySelect(exp, exp1);
+				exp = new ast.exp.ArraySelect(exp, exp1, current.getLineNum());
 			}
 		}
 		return exp;
@@ -176,7 +178,7 @@ public class Parser {
 
 		if (notTimes != 0)
 			for (int i = 0; i < notTimes; i++)
-				exp = new ast.exp.Not(exp);
+				exp = new ast.exp.Not(exp, current.getLineNum());
 
 		return exp;
 	}
@@ -191,7 +193,7 @@ public class Parser {
 		while (current.kind == Kind.TOKEN_TIMES) {
 			advance();
 			ast.exp.T right = parseTimesExp();
-			left = new ast.exp.Times(left, right);
+			left = new ast.exp.Times(left, right, current.getLineNum());
 		}
 		return left;
 	}
@@ -206,9 +208,9 @@ public class Parser {
 			advance();
 			ast.exp.T right = parseAddSubExp();
 			if (kind == Kind.TOKEN_ADD)
-				left = new ast.exp.Add(left, right);
+				left = new ast.exp.Add(left, right, current.getLineNum());
 			if (kind == Kind.TOKEN_SUB)
-				left = new ast.exp.Sub(left, right);
+				left = new ast.exp.Sub(left, right, current.getLineNum());
 		}
 		return left;
 	}
@@ -220,7 +222,7 @@ public class Parser {
 		while (current.kind == Kind.TOKEN_LT) {
 			advance();
 			ast.exp.T right = parseLtExp();
-			left = new ast.exp.Lt(left, right);
+			left = new ast.exp.Lt(left, right, current.getLineNum());
 		}
 		return left;
 	}
@@ -232,7 +234,7 @@ public class Parser {
 		while (current.kind == Kind.TOKEN_AND) {
 			advance();
 			ast.exp.T right = parseAndExp();
-			left = new ast.exp.And(left, right);
+			left = new ast.exp.And(left, right, current.getLineNum());
 		}
 		return left;
 	}
@@ -380,16 +382,17 @@ public class Parser {
 		// a fresh one.
 		ast.type.T type = parseType();
 		String id = current.lexeme;
+		int lineNum = current.getLineNum();
 		eatToken(Kind.TOKEN_ID);
 		eatToken(Kind.TOKEN_SEMI);
-		return new ast.dec.Dec(type, id);
+		return new ast.dec.Dec(type, id, lineNum);
 	}
 
 	// VarDecls -> VarDecl VarDecls
 	// ->
 	private LinkedList<ast.dec.T> parseVarDecls() {
 		// VarDecl* and Statement* can both start with "id",so it is ambiguous.
-		// To distinguish,we can read the next token.
+		// To distinguish it,we can read the next token.
 		LinkedList<ast.dec.T> decs = new LinkedList<>();
 		while (current.kind == Kind.TOKEN_INT
 				|| current.kind == Kind.TOKEN_BOOLEAN
@@ -421,14 +424,16 @@ public class Parser {
 				|| current.kind == Kind.TOKEN_ID) {
 			ast.type.T type = parseType();
 			String id = current.lexeme;
+			int lineNum = current.getLineNum();
 			eatToken(Kind.TOKEN_ID);
-			formals.add(new ast.dec.Dec(type, id));
+			formals.add(new ast.dec.Dec(type, id, lineNum));
 			while (current.kind == Kind.TOKEN_COMMER) {
 				advance();
 				type = parseType();
 				id = current.lexeme;
+				lineNum = current.getLineNum();
 				eatToken(Kind.TOKEN_ID);
-				formals.add(new ast.dec.Dec(type, id));
+				formals.add(new ast.dec.Dec(type, id, lineNum));
 			}
 		}
 		return formals;

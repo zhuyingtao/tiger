@@ -1,15 +1,20 @@
 package elaborator;
 
 import java.util.Enumeration;
+import java.util.Hashtable;
 
 public class MethodTable {
 	private java.util.Hashtable<String, ast.type.T> table;
-	private java.util.Hashtable<String, Boolean> isUsed;//exercise 9
+	private java.util.Hashtable<String, Boolean> isUsed;// exercise 9
 	String mid; // this is my add
+
+	private Hashtable<String, Integer> varLines;// mark the variable lineNum
+												// when it is declared
 
 	public MethodTable() {
 		this.table = new java.util.Hashtable<String, ast.type.T>();
 		this.isUsed = new java.util.Hashtable<String, Boolean>();
+		this.varLines = new Hashtable<String, Integer>();
 	}
 
 	// Duplication is not allowed
@@ -34,6 +39,7 @@ public class MethodTable {
 			}
 			this.table.put(decc.id, decc.type);
 			this.isUsed.put(decc.id, false);
+			this.varLines.put(decc.id, decc.lineNum);
 		}
 
 	}
@@ -72,7 +78,8 @@ public class MethodTable {
 			boolean nowUse = use.nextElement();
 			if (!nowUse)
 				System.out.println("Warning: the variable ' " + nowId
-						+ " ' is never used ! ---- in Method " + mid + "();");
+						+ " ' at line " + this.varLines.get(nowId)
+						+ " is never used ! ---- in Method " + mid + "();");
 		}
 	}
 }

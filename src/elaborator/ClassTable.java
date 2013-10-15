@@ -21,9 +21,9 @@ public class ClassTable {
 
 	// put a field into this table
 	// Duplication is not allowed
-	public void put(String c, String id, ast.type.T type) {
+	public void put(String c, String id, ast.type.T type, int lineNum) {
 		ClassBinding cb = this.table.get(c);
-		cb.put(id, type);
+		cb.put(id, type, lineNum);
 		return;
 	}
 
@@ -98,11 +98,11 @@ public class ClassTable {
 		Enumeration<Boolean> use = cb.isUsed.elements();
 		while (id.hasMoreElements()) {
 			String nowId = id.nextElement();
-			boolean nowUse = use.nextElement();
+			boolean nowUse = use.nextElement(); 
 			if (!nowUse)
 				System.out.println("Warning: the field ' " + nowId
-						+ " ' is never used ! ---- in Class " + className
-						+ " ;");
+						+ " ' at line " + cb.fieldLines.get(nowId)
+						+ " is never used ! ---- in Class " + className + " ;");
 		}
 	}
 }

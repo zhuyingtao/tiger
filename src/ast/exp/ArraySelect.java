@@ -5,7 +5,6 @@ public class ArraySelect extends T
   public T array;
   public T index;
   
-  public int lineNum;
 
   public ArraySelect(T array, T index)
   {

@@ -5,7 +5,6 @@ public class Id extends T {
 	public ast.type.T type; // type of the id
 	public boolean isField; // whether or not this is a class field
 
-	public int lineNum;
 
 	public Id(String id) {
 		this.id = id;

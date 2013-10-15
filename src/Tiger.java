@@ -5,10 +5,8 @@ import java.io.InputStream;
 import lexer.Lexer;
 import lexer.Token;
 import lexer.Token.Kind;
-
-import control.CommandLine;
-
 import parser.Parser;
+import control.CommandLine;
 
 public class Tiger {
 
@@ -18,10 +16,10 @@ public class Tiger {
 
 		// ///////////////////////////////////////////////////////
 		// handle command line arguments
-		// CommandLine cmd = new CommandLine();
-		// String fname = cmd.scan(args);
+		CommandLine cmd = new CommandLine();
+		String fname = cmd.scan(args);
 
-		String fname = "test/MyTest.java";
+		// String fname = "test/TreeVisitor.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -35,10 +33,10 @@ public class Tiger {
 			System.exit(1);
 		}
 
-		// if (fname == null) {
-		// cmd.usage();
-		// return;
-		// }
+		if (fname == null) {
+			cmd.usage();
+			return;
+		}
 
 		// /////////////////////////////////////////////////////
 		// it would be helpful to be able to test the lexer

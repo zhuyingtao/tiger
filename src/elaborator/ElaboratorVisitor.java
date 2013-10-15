@@ -6,6 +6,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public String currentClass; // the class name being elaborated
 	public ast.type.T type; // type of the expression being elaborated
 
+	public int errLine; // mark the error's lineNum
+	public String errID;// mark the error identify
+
 	public ElaboratorVisitor() {
 		this.classTable = new ClassTable();
 		this.methodTable = new MethodTable();
@@ -15,16 +18,47 @@ public class ElaboratorVisitor implements ast.Visitor {
 	}
 
 	private void error(String error) {
+		System.err.print("Error: ");
 		switch (error) {
-		case "Not Declare":
-			System.out.println("The ID has not been declared!");
+		case "NotDeclare":
+			System.err.println("the identify ' " + this.errID
+					+ " ' has not been declared!" + " --- at line "
+					+ this.errLine);
 
 			break;
 		case "NotSame":
-			System.out.println("The type of the expression"
-					+ " between the binary operator must be same!");
-			System.out.println("---- at ");
+			System.err.println("the type of the expression"
+					+ " between the operator ' " + this.errID
+					+ " ' must be same! --- at line " + this.errLine);
+			break;
+		case "ArrayIndex":
+			System.err.println("the index of array must be the type of int!"
+					+ " --- at line " + this.errLine);
 
+			break;
+		case "IntArray":
+			System.err.println("the type of the array must be int[]!"
+					+ " --- at line " + this.errLine);
+
+			break;
+		case "NotClass":
+			System.err.println("the method must be called by a class!"
+					+ " --- at line " + this.errLine);
+
+			break;
+		case "Parameters":
+			System.err.println("the parameters of the method ' " + this.errID
+					+ "() ' don't match" + " --- at line " + this.errLine);
+
+			break;
+		case "NotBoolean":
+			System.err.println("the type of the expression must be boolean!"
+					+ " --- at line " + this.errLine);
+			break;
+		case "PrintInt":
+			System.err.println("the method print() can only print Integer now!"
+					+ " --- at line " + this.errLine);
+			break;
 		default:
 			System.out.println(error);
 		}
@@ -38,8 +72,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 		e.left.accept(this);
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
-		if (!leftty.toString().equals(this.type.toString()))
+		if (!leftty.toString().equals(this.type.toString())) {
+			this.errID = "+";
+			this.errLine = e.lineNum;
 			error("NotSame");
+		}
 		this.type = new ast.type.Int();
 	}
 
@@ -48,21 +85,28 @@ public class ElaboratorVisitor implements ast.Visitor {
 		e.left.accept(this);
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
-		if (!leftty.toString().equals(this.type.toString()))
-			error("and");
+		if (!leftty.toString().equals(this.type.toString())) {
+			this.errID = "&&";
+			this.errLine = e.lineNum;
+			error("NotSame");
+		}
 		this.type = new ast.type.Boolean();
 	}
 
 	@Override
 	public void visit(ast.exp.ArraySelect e) {
 		e.index.accept(this);
-		if (!this.type.toString().equals("@int"))
-			error("as1");
+		if (!this.type.toString().equals("@int")) {
+			this.errLine = e.lineNum;
+			error("ArrayIndex");
+		}
 		//
-		// check index
+		// check index out of bounds?
 		e.array.accept(this);
-		if (!this.type.toString().equals("@int[]"))
-			error("as2");
+		if (!this.type.toString().equals("@int[]")) {
+			this.errLine = e.lineNum;
+			error("IntArray");
+		}
 		this.type = new ast.type.Int();
 	}
 
@@ -76,8 +120,10 @@ public class ElaboratorVisitor implements ast.Visitor {
 		if (leftty instanceof ast.type.Class) {
 			ty = (ast.type.Class) leftty;
 			e.type = ty.id; // the class name
-		} else
-			error("call1");
+		} else {
+			this.errLine = e.lineNum;
+			error("NotClass");
+		}
 		// get the args type of this method in classTable
 		MethodType mty = this.classTable.getm(ty.id, e.id);
 		// get the args type of this method being called
@@ -89,8 +135,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 			}
 		}
 		// contrast them
-		if (mty.argsType.size() != argsty.size())
-			error("call2");
+		if (mty.argsType.size() != argsty.size()) {
+			this.errLine = e.lineNum;
+			this.errID = e.id;
+			error("Parameters");
+		}
 
 		// Bug : such as "Visitor : MyVisitor(extends Visitor)" don't match
 		for (int i = 0; i < argsty.size(); i++) {
@@ -111,11 +160,15 @@ public class ElaboratorVisitor implements ast.Visitor {
 						} else
 							cb = this.classTable.get(cb.extendss);
 					}
-					if (!matches)
-						error("call4");
+					if (!matches) {
+						this.errLine = e.lineNum;
+						this.errID = e.id;
+						error("Parameters");
+					}
 				} else {
-					error("call3--->" + dec.type + "," + dec.id + "\n "
-							+ this.currentClass + "." + e.id.toString());
+					this.errLine = e.lineNum;
+					this.errID = e.id;
+					error("Parameters");
 				}
 			}
 		}
@@ -142,8 +195,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 			// useful in later phase.
 			e.isField = true;
 		}
-		if (type == null)
-			error("id1");
+		if (type == null) {
+			this.errLine = e.lineNum;
+			this.errID = e.id;
+			error("NotDeclare");
+		}
 		this.type = type;
 		// record this type on this node for future use.
 		e.type = type;
@@ -153,8 +209,10 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.exp.Length e) {
 		e.array.accept(this);
-		if (!this.type.toString().equals("@int[]"))
-			error("length");
+		if (!this.type.toString().equals("@int[]")) {
+			this.errLine = e.lineNum;
+			error("IntArray");
+		}
 		this.type = new ast.type.Int();
 	}
 
@@ -163,8 +221,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 		e.left.accept(this);
 		ast.type.T ty = this.type;
 		e.right.accept(this);
-		if (!this.type.toString().equals(ty.toString()))
-			error("lt");
+		if (!this.type.toString().equals(ty.toString())) {
+			this.errID = "<";
+			this.errLine = e.lineNum;
+			error("NotSame");
+		}
 		this.type = new ast.type.Boolean();
 		return;
 	}
@@ -172,8 +233,10 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.exp.NewIntArray e) {
 		e.exp.accept(this);
-		if (!this.type.toString().equals("@int"))
-			error("nia");
+		if (!this.type.toString().equals("@int")) {
+			this.errLine = e.lineNum;
+			error("ArrayIndex");
+		}
 		this.type = new ast.type.IntArray();
 	}
 
@@ -186,8 +249,10 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.exp.Not e) {
 		e.exp.accept(this);
-		if (!this.type.toString().equals("@boolean"))
-			error("not");
+		if (!this.type.toString().equals("@boolean")) {
+			this.errLine = e.lineNum;
+			error("NotBoolean");
+		}
 		this.type = new ast.type.Boolean();
 	}
 
@@ -202,8 +267,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 		e.left.accept(this);
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
-		if (!this.type.toString().equals(leftty.toString()))
-			error("sub");
+		if (!this.type.toString().equals(leftty.toString())) {
+			this.errID = "-";
+			this.errLine = e.lineNum;
+			error("NotSame");
+		}
 		this.type = new ast.type.Int();
 		return;
 	}
@@ -219,8 +287,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 		e.left.accept(this);
 		ast.type.T leftty = this.type;
 		e.right.accept(this);
-		if (!this.type.toString().equals(leftty.toString()))// must int??
-			error("times");
+		if (!this.type.toString().equals(leftty.toString())) {// Not must int??
+			this.errID = "*";
+			this.errLine = e.lineNum;
+			error("NotSame");
+		}
 		this.type = new ast.type.Int();
 		return;
 	}
@@ -239,12 +310,18 @@ public class ElaboratorVisitor implements ast.Visitor {
 		if (type == null)
 			type = this.classTable.get(this.currentClass, s.id);
 		// if search failed, then s.id must have not been declared
-		if (type == null)
-			error("assign1");
+		if (type == null) {
+			this.errLine = s.exp.lineNum;
+			this.errID = s.id;
+			error("NotDeclare");
+		}
 		s.exp.accept(this);
 		s.type = type; // not this.type ,this.type now is the exp type
-		if (!this.type.toString().equals(type.toString()))
-			error("assign2");
+		if (!this.type.toString().equals(type.toString())) {
+			this.errLine = s.exp.lineNum;
+			this.errID = "=";
+			error("NotSame");
+		}
 		return;
 	}
 
@@ -253,13 +330,24 @@ public class ElaboratorVisitor implements ast.Visitor {
 		ast.type.T type = this.methodTable.get(s.id);
 		if (type == null)
 			type = this.classTable.get(this.currentClass, s.id);
-		if (type == null)
-			error("assignarray1");
+		if (type == null) {
+			this.errID = s.id;
+			this.errLine = s.index.lineNum;
+			error("NotDeclare");
+		}
+
+		s.index.accept(this);
+		if (!this.type.toString().equals("@int")) {
+			this.errLine = s.index.lineNum;
+			error("ArrayIndex");
+		}
 		//
 		// Is it necessary to check whether the index out of bounds now?
 		s.exp.accept(this);
-		if (!this.type.toString().equals("@int"))// only support int[]
-			error("assignarray2");
+		if (!this.type.toString().equals("@int")) {// only support int[]
+			this.errLine = s.exp.lineNum;
+			error("IntArray");
+		}
 		return;
 
 	}
@@ -274,8 +362,10 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.stm.If s) {
 		s.condition.accept(this);
-		if (!this.type.toString().equals("@boolean"))
-			error("if");
+		if (!this.type.toString().equals("@boolean")) {
+			this.errLine = s.condition.lineNum;
+			error("NotBoolean");
+		}
 		s.thenn.accept(this);
 		s.elsee.accept(this);
 		return;
@@ -284,43 +374,42 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.stm.Print s) {
 		s.exp.accept(this);
-		if (!this.type.toString().equals("@int"))
-			error("print");
+		if (!this.type.toString().equals("@int")) {
+			this.errLine = s.exp.lineNum;
+			error("PrintInt");
+		}
 		return;
 	}
 
 	@Override
 	public void visit(ast.stm.While s) {
 		s.condition.accept(this);
-		if (!this.type.toString().equals("@boolean"))
-			error("while");
+		if (!this.type.toString().equals("@boolean")) {
+			this.errLine = s.condition.lineNum;
+			error("NotBoolean");
+		}
 		s.body.accept(this);
 	}
 
 	// type not use now
-	int boo = 0;
-	int cla = 0;
-	int inte = 0;
-	int arr = 0;
-
 	@Override
 	public void visit(ast.type.Boolean t) {
-		System.out.println("boolean@" + boo++);
+		System.out.println("boolean@");
 	}
 
 	@Override
 	public void visit(ast.type.Class t) {
-		System.out.println("class@" + cla++);
+		System.out.println("class@");
 	}
 
 	@Override
 	public void visit(ast.type.Int t) {
-		System.out.println("int@" + inte++);
+		System.out.println("int@");
 	}
 
 	@Override
 	public void visit(ast.type.IntArray t) {
-		System.out.println("intArray@" + arr++);
+		System.out.println("intArray@");
 	}
 
 	// dec
@@ -392,7 +481,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		this.classTable.put(c.id, new ClassBinding(c.extendss));
 		for (ast.dec.T dec : c.decs) {
 			ast.dec.Dec d = (ast.dec.Dec) dec;
-			this.classTable.put(c.id, d.id, d.type);
+			this.classTable.put(c.id, d.id, d.type, d.lineNum);
 		}
 		for (ast.method.T method : c.methods) {
 			ast.method.Method m = (ast.method.Method) method;

@@ -3,8 +3,6 @@ package ast.exp;
 public class NewObject extends T
 {
   public String id; 
-  
-  public int lineNum;
 
   public NewObject(String id)
   {

@@ -1,18 +1,23 @@
 package elaborator;
 
+import java.util.Hashtable;
 
 public class ClassBinding {
 	public String extendss; // null for non-existing extends
-	public java.util.Hashtable<String, ast.type.T> fields;
-	public java.util.Hashtable<String, MethodType> methods;
-	public java.util.Hashtable<String, Boolean> isUsed; // whether the fields
-														// have been used
+	public Hashtable<String, ast.type.T> fields;
+	public Hashtable<String, MethodType> methods;
+	public Hashtable<String, Boolean> isUsed; // whether the fields
+												// have been used
+
+	public Hashtable<String, Integer> fieldLines; // mark the field lineNum when
+													// it is declared
 
 	public ClassBinding(String extendss) {
 		this.extendss = extendss;
-		this.fields = new java.util.Hashtable<String, ast.type.T>();
-		this.methods = new java.util.Hashtable<String, MethodType>();
-		this.isUsed=new java.util.Hashtable<String, Boolean>();
+		this.fields = new Hashtable<String, ast.type.T>();
+		this.methods = new Hashtable<String, MethodType>();
+		this.isUsed = new Hashtable<String, Boolean>();
+		this.fieldLines = new Hashtable<String, Integer>();
 	}
 
 	public ClassBinding(String extendss,
@@ -23,13 +28,14 @@ public class ClassBinding {
 		this.methods = methods;
 	}
 
-	public void put(String xid, ast.type.T type) {
+	public void put(String xid, ast.type.T type, int lineNum) {
 		if (this.fields.get(xid) != null) {
 			System.out.println("duplicated class field: " + xid);
 			System.exit(1);
 		}
 		this.fields.put(xid, type);
 		this.isUsed.put(xid, false);
+		this.fieldLines.put(xid, lineNum);
 	}
 
 	public void put(String mid, MethodType mt) {

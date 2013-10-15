@@ -3,8 +3,7 @@ package ast.exp;
 public class And extends T {
 	public T left;
 	public T right;
-
-	public int lineNum;
+	
 
 	public And(T left, T right) {
 		this.left = left;

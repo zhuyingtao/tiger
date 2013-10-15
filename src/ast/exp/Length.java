@@ -3,8 +3,6 @@ package ast.exp;
 public class Length extends T {
 	public T array;
 
-	public int lineNum;
-
 	public Length(T array) {
 		this.array = array;
 	}

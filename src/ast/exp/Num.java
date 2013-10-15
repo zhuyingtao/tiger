@@ -3,8 +3,6 @@ package ast.exp;
 public class Num extends T {
 	public int num;
 
-	public int lineNum;
-
 	public Num(int num) {
 		this.num = num;
 	}

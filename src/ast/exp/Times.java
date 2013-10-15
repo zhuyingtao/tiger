@@ -4,8 +4,6 @@ public class Times extends T {
 	public T left;
 	public T right;
 
-	public int lineNum;
-
 	public Times(T left, T right) {
 		this.left = left;
 		this.right = right;

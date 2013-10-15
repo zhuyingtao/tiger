@@ -4,7 +4,6 @@ public class Lt extends T {
 	public T left;
 	public T right;
 
-	public int lineNum;
 
 	public Lt(T left, T right) {
 		this.left = left;

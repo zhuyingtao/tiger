@@ -3,8 +3,6 @@ package ast.exp;
 public class NewIntArray extends T
 {
   public T exp; 
-  
-  public int lineNum;
 
   public NewIntArray(T exp)
   {
