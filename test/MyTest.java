@@ -22,14 +22,14 @@ class Fac {
 			num_aux = num * (this.ComputeFac(num - 1));
 		num = 1 + 2 * 3 + 5 * 7;
 
-		come=!num_aux;
-		tt = new Test();
-		num_aux = tt.test(barray);
-		num_aux[10] = 1;
-		array[come] = 10;
-		num_aux = come;
-		num_aux = come + 1;
-		lesss = num_aux + 1;
+//		come=!num_aux;
+//		tt = new Test();
+//		num_aux = tt.test(barray);
+//		num_aux[10] = 1;
+//		array[come] = 10;
+//		num_aux = come;
+//		num_aux = come + 1;
+//		lesss = num_aux + 1;
 
 		return num_aux;
 	}
