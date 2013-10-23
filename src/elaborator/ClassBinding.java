@@ -1,28 +1,28 @@
 package elaborator;
 
-import java.util.Hashtable;
+import java.util.LinkedHashMap;
 
 public class ClassBinding {
 	public String extendss; // null for non-existing extends
-	public Hashtable<String, ast.type.T> fields;
-	public Hashtable<String, MethodType> methods;
-	public Hashtable<String, Boolean> isUsed; // whether the fields
-												// have been used
+	public LinkedHashMap<String, ast.type.T> fields;
+	public LinkedHashMap<String, MethodType> methods;
 
-	public Hashtable<String, Integer> fieldLines; // mark the field lineNum when
-													// it is declared
+	// whether the fields have been used
+	public LinkedHashMap<String, Boolean> isUsed;
+	// mark the field lineNum when it is declared
+	public LinkedHashMap<String, Integer> fieldLines;
 
 	public ClassBinding(String extendss) {
 		this.extendss = extendss;
-		this.fields = new Hashtable<String, ast.type.T>();
-		this.methods = new Hashtable<String, MethodType>();
-		this.isUsed = new Hashtable<String, Boolean>();
-		this.fieldLines = new Hashtable<String, Integer>();
+		this.fields = new LinkedHashMap<String, ast.type.T>();
+		this.methods = new LinkedHashMap<String, MethodType>();
+		this.isUsed = new LinkedHashMap<String, Boolean>();
+		this.fieldLines = new LinkedHashMap<String, Integer>();
 	}
 
 	public ClassBinding(String extendss,
-			java.util.Hashtable<String, ast.type.T> fields,
-			java.util.Hashtable<String, MethodType> methods) {
+			java.util.LinkedHashMap<String, ast.type.T> fields,
+			java.util.LinkedHashMap<String, MethodType> methods) {
 		this.extendss = extendss;
 		this.fields = fields;
 		this.methods = methods;
@@ -60,5 +60,4 @@ public class ClassBinding {
 
 		return "";
 	}
-
 }

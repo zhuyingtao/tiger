@@ -19,7 +19,12 @@ public class Tiger {
 		CommandLine cmd = new CommandLine();
 		String fname = cmd.scan(args);
 
-		// String fname = "test/TreeVisitor.java";
+		if (fname == null) {
+			cmd.usage();
+			return;
+		}
+		// String fname = "test/MyTest.java";
+
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -31,11 +36,6 @@ public class Tiger {
 			System.out.println("Testing the Tiger compiler on"
 					+ " Fac.java && Sum.java finished.");
 			System.exit(1);
-		}
-
-		if (fname == null) {
-			cmd.usage();
-			return;
 		}
 
 		// /////////////////////////////////////////////////////

@@ -1,20 +1,24 @@
 package elaborator;
 
-import java.util.Enumeration;
-import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Map.Entry;
+
+import ast.type.T;
 
 public class MethodTable {
-	private java.util.Hashtable<String, ast.type.T> table;
-	private java.util.Hashtable<String, Boolean> isUsed;// exercise 9
-	String mid; // this is my add
+	// private java.util.Hashtable<String, ast.type.T> table;
+	private java.util.LinkedHashMap<String, ast.type.T> table;
+	private java.util.LinkedHashMap<String, Boolean> isUsed;// exercise 9
 
-	private Hashtable<String, Integer> varLines;// mark the variable lineNum
-												// when it is declared
+	// mark the variable lineNum when it is declared
+	private java.util.LinkedHashMap<String, Integer> varLines;
+	String mid; // mark the name of the method
 
 	public MethodTable() {
-		this.table = new java.util.Hashtable<String, ast.type.T>();
-		this.isUsed = new java.util.Hashtable<String, Boolean>();
-		this.varLines = new Hashtable<String, Integer>();
+		// this.table = new java.util.Hashtable<String, ast.type.T>();
+		this.table = new java.util.LinkedHashMap<String, ast.type.T>();
+		this.isUsed = new java.util.LinkedHashMap<String, Boolean>();
+		this.varLines = new java.util.LinkedHashMap<String, Integer>();
 	}
 
 	// Duplication is not allowed
@@ -54,15 +58,17 @@ public class MethodTable {
 
 	public void dump() {
 		System.out.println("====== " + mid + " Method ======");
-		Enumeration<String> id = this.table.keys();
-		Enumeration<ast.type.T> type = this.table.elements();
+		// Enumeration<String> id = this.table.keys();
+		// Enumeration<ast.type.T> type = this.table.elements();
+		Iterator<Entry<String, T>> iterator = this.table.entrySet().iterator();
 		int i = 0;
-		while (id.hasMoreElements()) {
-			System.out.print(i + " : " + id.nextElement() + "---");
-			System.out.println(type.nextElement().toString());
+		while (iterator.hasNext()) {
+			Entry<String, ast.type.T> entry = iterator.next();
+			System.out.print(i + " : " + entry.getKey() + "---");
+			System.out.println(entry.getValue().toString());
 			i++;
 		}
-		System.out.println("========== End =========");
+		System.out.println("========== End =========\n");
 	}
 
 	@Override
@@ -71,11 +77,14 @@ public class MethodTable {
 	}
 
 	public void isVariableUsed() {
-		Enumeration<String> id = this.isUsed.keys();
-		Enumeration<Boolean> use = this.isUsed.elements();
-		while (id.hasMoreElements()) {
-			String nowId = id.nextElement();
-			boolean nowUse = use.nextElement();
+		Iterator<Entry<String, Boolean>> iterator = this.isUsed.entrySet()
+				.iterator();
+		// Enumeration<String> id = this.isUsed.keys();
+		// Enumeration<Boolean> use = this.isUsed.elements();
+		while (iterator.hasNext()) {
+			Entry<String, Boolean> entry = iterator.next();
+			String nowId = entry.getKey();
+			boolean nowUse = entry.getValue();
 			if (!nowUse)
 				System.out.println("Warning: the variable ' " + nowId
 						+ " ' at line " + this.varLines.get(nowId)

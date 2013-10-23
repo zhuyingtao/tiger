@@ -37,9 +37,21 @@ public class PrettyPrintVisitor implements Visitor {
 		// Similar for other methods with empty bodies.
 		// Your code here:
 		/**************** My Code ******************/
+		// At here,the () is only used to show the priority of the operator,you
+		// can delete it either.
+		if (!(e.left instanceof ast.exp.Num) && !(e.left instanceof ast.exp.Id))
+			this.say("(");
 		e.left.accept(this);
+		if (!(e.left instanceof ast.exp.Num) && !(e.left instanceof ast.exp.Id))
+			this.say(")");
 		this.say(" + ");
+		if (!(e.right instanceof ast.exp.Num)
+				&& !(e.right instanceof ast.exp.Id))
+			this.say("(");
 		e.right.accept(this);
+		if (!(e.right instanceof ast.exp.Num)
+				&& !(e.right instanceof ast.exp.Id))
+			this.say(")");
 	}
 
 	@Override
@@ -124,9 +136,19 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(ast.exp.Sub e) {
+		if (!(e.left instanceof ast.exp.Num) && !(e.left instanceof ast.exp.Id))
+			this.say("(");
 		e.left.accept(this);
+		if (!(e.left instanceof ast.exp.Num) && !(e.left instanceof ast.exp.Id))
+			this.say(")");
 		this.say(" - ");
+		if (!(e.right instanceof ast.exp.Num)
+				&& !(e.right instanceof ast.exp.Id))
+			this.say("(");
 		e.right.accept(this);
+		if (!(e.right instanceof ast.exp.Num)
+				&& !(e.right instanceof ast.exp.Id))
+			this.say(")");
 		return;
 	}
 
@@ -137,9 +159,19 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(ast.exp.Times e) {
+		if (!(e.left instanceof ast.exp.Num) && !(e.left instanceof ast.exp.Id))
+			this.say("(");
 		e.left.accept(this);
+		if (!(e.left instanceof ast.exp.Num) && !(e.left instanceof ast.exp.Id))
+			this.say(")");
 		this.say(" * ");
+		if (!(e.right instanceof ast.exp.Num)
+				&& !(e.right instanceof ast.exp.Id))
+			this.say("(");
 		e.right.accept(this);
+		if (!(e.right instanceof ast.exp.Num)
+				&& !(e.right instanceof ast.exp.Id))
+			this.say(")");
 		return;
 	}
 

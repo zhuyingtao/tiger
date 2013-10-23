@@ -1,13 +1,21 @@
 package elaborator;
 
-import java.util.Enumeration;
+
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 public class ClassTable {
 	// map each class name (a string), to the class bindings.
-	private java.util.Hashtable<String, ClassBinding> table;
+	/* the next to do....................... */
+	// we used hashtable here before,but it has a problem that it doesn't output
+	// in the input order,so we change it to LinkedHashMap.
+
+	// private java.util.Hashtable<String, ClassBinding> table;
+	private java.util.LinkedHashMap<String, ClassBinding> table;
 
 	public ClassTable() {
-		this.table = new java.util.Hashtable<String, ClassBinding>();
+		// this.table = new java.util.Hashtable<String, ClassBinding>();
+		this.table = new java.util.LinkedHashMap<String, ClassBinding>();
 	}
 
 	// Duplication is not allowed
@@ -74,17 +82,22 @@ public class ClassTable {
 
 	public void dump() {
 		System.out.println("=============Class Table Start=============");
-		Enumeration<String> id = this.table.keys();
-		Enumeration<ClassBinding> classes = this.table.elements();
+		// Enumeration<String> id = this.table.keys();
+		// Enumeration<ClassBinding> classes = this.table.elements();
+
+		Iterator<Entry<String, ClassBinding>> iterator = this.table.entrySet()
+				.iterator();
 		int i = 0;
-		while (id.hasMoreElements()) {
-			System.out.print(i + " : " + id.nextElement() + "  ");
-			System.out.println(classes.nextElement().toString());
+		while (iterator.hasNext()) {
+			Entry<String, ClassBinding> entry = iterator.next();
+			String id = entry.getKey();
+			ClassBinding cb = entry.getValue();
+			System.out.print(i + " : " + id + "  ");
+			System.out.println(cb.toString());
 			i++;
 		}
 		System.out.println("=============Class Table End===============\n");
 		// this.table.toString();
-
 	}
 
 	@Override
@@ -94,11 +107,14 @@ public class ClassTable {
 
 	public void isFieldUsed(String className) {
 		ClassBinding cb = this.table.get(className);
-		Enumeration<String> id = cb.isUsed.keys();
-		Enumeration<Boolean> use = cb.isUsed.elements();
-		while (id.hasMoreElements()) {
-			String nowId = id.nextElement();
-			boolean nowUse = use.nextElement(); 
+		Iterator<Entry<String, Boolean>> iterator = cb.isUsed.entrySet()
+				.iterator();
+		// Enumeration<String> id = cb.isUsed.keys();
+		// Enumeration<Boolean> use = cb.isUsed.elements();
+		while (iterator.hasNext()) {
+			Entry<String, Boolean> entry = iterator.next();
+			String nowId = entry.getKey();
+			boolean nowUse = entry.getValue();
 			if (!nowUse)
 				System.out.println("Warning: the field ' " + nowId
 						+ " ' at line " + cb.fieldLines.get(nowId)
