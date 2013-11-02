@@ -4,7 +4,7 @@ import codegen.C.Visitor;
 
 public class Call extends T
 {
-  public String assign;
+  public String assign;//what this mean?
   public T exp;
   public String id;
   public java.util.LinkedList<T> args;

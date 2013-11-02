@@ -17,9 +17,10 @@ public class Tiger {
 
 		// ///////////////////////////////////////////////////////
 		// handle command line arguments
-		CommandLine cmd = new CommandLine();
-		String fname = cmd.scan(args);
+		// CommandLine cmd = new CommandLine();
+		// String fname = cmd.scan(args);
 
+		String fname = "test/Sum.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -50,10 +51,10 @@ public class Tiger {
 			System.exit(1);
 		}
 
-		if (fname == null) {
-			cmd.usage();
-			return;
-		}
+		// if (fname == null) {
+		// cmd.usage();
+		// return;
+		// }
 		Control.fileName = fname;
 
 		// /////////////////////////////////////////////////////
