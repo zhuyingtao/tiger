@@ -5,6 +5,7 @@ public class Assign extends T {
 	public ast.exp.T exp;
 	public ast.type.T type; // type of the id
 
+	public boolean idIsField = false;
 
 	public Assign(String id, ast.exp.T exp) {
 		this.id = id;

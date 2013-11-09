@@ -6,7 +6,7 @@ public class Control {
 
 	// compiler testing and debugging
 	public static boolean testlexer = false;
-	public static boolean testFac = true;
+	public static boolean testFac = false;
 
 	// lexer and parser
 	public static boolean lex = false;

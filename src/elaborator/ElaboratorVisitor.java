@@ -307,8 +307,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 		// first look up the id in method table
 		ast.type.T type = this.methodTable.get(s.id);
 		// if failed,then search the class table
-		if (type == null)
+		if (type == null) {
 			type = this.classTable.get(this.currentClass, s.id);
+			if (type != null)
+				s.idIsField = true;
+		}
 		// if search failed, then s.id must have not been declared
 		if (type == null) {
 			this.errLine = s.exp.lineNum;
@@ -328,8 +331,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.stm.AssignArray s) {
 		ast.type.T type = this.methodTable.get(s.id);
-		if (type == null)
+		if (type == null) {
 			type = this.classTable.get(this.currentClass, s.id);
+			if (type != null)
+				s.idIsField=true;
+		}
 		if (type == null) {
 			this.errID = s.id;
 			this.errLine = s.index.lineNum;

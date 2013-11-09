@@ -1,6 +1,6 @@
 class Sum {
 	public static void main(String[] a) {
-		System.out.println(new Doit().doit(101));
+		System.out.println(new Doit().doit(20));
 	}
 }
 
@@ -12,11 +12,7 @@ class Doit {
 		sum = 0;
 		while (i < n) {
 			sum = sum + i;
-			while (i < 10) {
-				sum = sum + 1;
-				while (true)
-					sum = sum + sum;
-			}
+			i=i+1;
 		}
 		return sum;
 	}

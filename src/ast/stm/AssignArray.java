@@ -6,6 +6,8 @@ public class AssignArray extends T
   public ast.exp.T index;
   public ast.exp.T exp;
 
+  public boolean idIsField=false;
+  
   public AssignArray(String id, ast.exp.T index, ast.exp.T exp)
   {
     this.id = id;

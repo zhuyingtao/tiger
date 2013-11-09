@@ -1,5 +1,6 @@
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 
 import lexer.Lexer;
@@ -8,6 +9,7 @@ import lexer.Token.Kind;
 import parser.Parser;
 import control.CommandLine;
 import control.Control;
+import control.Control.Codegen_Kind_t;
 
 public class Tiger {
 
@@ -20,7 +22,7 @@ public class Tiger {
 		// CommandLine cmd = new CommandLine();
 		// String fname = cmd.scan(args);
 
-		String fname = "test/Sum.java";
+		String fname = "test/TreeVisitor.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -131,7 +133,17 @@ public class Tiger {
 		// call gcc to compile the generated C or x86
 		// file, or call java to run the bytecode file.
 		// Your code:
-
-		return;
+		if (control.Control.codegen == Codegen_Kind_t.C) {
+			Runtime run = Runtime.getRuntime();
+			try {
+				run.exec("gcc -c " + fname + ".c -o " + fname + ".o");
+				run.exec("gcc " + fname + ".c  runtime/runtime.c -o " + fname
+						+ ".exe");
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
 	}
 }

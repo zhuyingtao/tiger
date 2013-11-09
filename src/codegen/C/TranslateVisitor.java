@@ -75,9 +75,11 @@ public class TranslateVisitor implements ast.Visitor {
 				new codegen.C.type.Class(e.type), newid));
 		codegen.C.exp.T exp = this.exp;
 		java.util.LinkedList<codegen.C.exp.T> args = new java.util.LinkedList<codegen.C.exp.T>();
-		for (ast.exp.T x : e.args) {
-			x.accept(this);
-			args.add(this.exp);
+		if (e.args != null) {
+			for (ast.exp.T x : e.args) {
+				x.accept(this);
+				args.add(this.exp);
+			}
 		}
 		this.exp = new codegen.C.exp.Call(newid, exp, e.id, args);
 		return;
@@ -91,7 +93,10 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Id e) {
-		this.exp = new codegen.C.exp.Id(e.id);
+		if (e.isField == true)
+			this.exp = new codegen.C.exp.Id(e.id, true);
+		else
+			this.exp = new codegen.C.exp.Id(e.id);
 		return;
 	}
 
@@ -175,7 +180,7 @@ public class TranslateVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.stm.Assign s) {
 		s.exp.accept(this);
-		this.stm = new codegen.C.stm.Assign(s.id, this.exp);
+		this.stm = new codegen.C.stm.Assign(s.id, this.exp, s.idIsField);
 		return;
 	}
 
@@ -185,7 +190,7 @@ public class TranslateVisitor implements ast.Visitor {
 		codegen.C.exp.T index = this.exp;
 		s.exp.accept(this);
 		codegen.C.exp.T exp = this.exp;
-		this.stm = new codegen.C.stm.AssignArray(s.id, index, exp);
+		this.stm = new codegen.C.stm.AssignArray(s.id, index, exp, s.idIsField);
 	}
 
 	@Override
@@ -229,11 +234,12 @@ public class TranslateVisitor implements ast.Visitor {
 	// type
 	@Override
 	public void visit(ast.type.Boolean t) {
+		this.type = new codegen.C.type.Int();
 	}
 
 	@Override
 	public void visit(ast.type.Class t) {
-		this.type=new codegen.C.type.Class(t.id);
+		this.type = new codegen.C.type.Class(t.id);
 	}
 
 	@Override
@@ -243,7 +249,7 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.type.IntArray t) {
-		this.type=new codegen.C.type.IntArray();
+		this.type = new codegen.C.type.IntArray();
 	}
 
 	// dec
