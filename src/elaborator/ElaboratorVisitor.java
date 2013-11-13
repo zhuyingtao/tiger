@@ -155,6 +155,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 					boolean matches = false;
 					while (cb.extendss != null) {
 						if (dec.type.toString().equals(cb.extendss)) {
+							argsty.set(i, new ast.type.Class(cb.extendss));
+							// the above code is used in the bytecode
+							// generator for subtype polymorphism !
 							matches = true;
 							break;
 						} else
@@ -334,7 +337,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		if (type == null) {
 			type = this.classTable.get(this.currentClass, s.id);
 			if (type != null)
-				s.idIsField=true;
+				s.idIsField = true;
 		}
 		if (type == null) {
 			this.errID = s.id;

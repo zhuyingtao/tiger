@@ -10,7 +10,7 @@ int System_out_println (int i)
 
 int* Array_new(int sz){
 	int* id=(int*) malloc(sizeof(int)*(sz+1));
-	id[sz]=0;
+	id[sz]=0; //to mark the end of the array
 	return id;
 }
 

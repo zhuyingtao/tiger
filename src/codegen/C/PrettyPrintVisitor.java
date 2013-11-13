@@ -96,9 +96,9 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(codegen.C.exp.Length e) {
-//		this.say("sizeof(");
-//		e.array.accept(this);
-//		this.say(")");
+		// this.say("sizeof(");
+		// e.array.accept(this);
+		// this.say(")");
 		this.say("Length(");
 		e.array.accept(this);
 		this.say(")");
@@ -208,7 +208,7 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("}else{");
 		this.indent();
 		s.elsee.accept(this);
-		
+
 		this.unIndent();
 		this.printSpaces();
 		this.sayln("}");
@@ -338,8 +338,8 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("};\n");
 		return;
 	}
-	
-	public void declareVtable(codegen.C.vtable.Vtable v){
+
+	public void declareVtable(codegen.C.vtable.Vtable v) {
 		this.sayln("struct " + v.id + "_vtable " + v.id + "_vtable_ ;");
 	}
 
@@ -368,7 +368,7 @@ public class PrettyPrintVisitor implements Visitor {
 			if (Control.outputName != null)
 				outputName = Control.outputName;
 			else if (Control.fileName != null)
-				outputName = Control.fileName + ".c";
+				outputName = "test/ccodeTest/" + Control.fileName + ".c";
 			else
 				outputName = "a.c";
 
@@ -394,13 +394,13 @@ public class PrettyPrintVisitor implements Visitor {
 			v.accept(this);
 		}
 		this.sayln("");
-		
+
 		this.sayln("// vtables declared");
 		for (codegen.C.vtable.T v : p.vtables) {
 			declareVtable((codegen.C.vtable.Vtable) v);
 		}
 		this.sayln("");
-		
+
 		this.sayln("// methods");
 		for (codegen.C.method.T m : p.methods) {
 			m.accept(this);

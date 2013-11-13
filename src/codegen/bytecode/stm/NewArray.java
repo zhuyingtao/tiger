@@ -5,7 +5,6 @@ import codegen.bytecode.Visitor;
 public class NewArray extends T {
 
 	public NewArray() {
-
 	}
 
 	@Override

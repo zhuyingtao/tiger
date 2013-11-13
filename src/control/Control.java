@@ -2,7 +2,7 @@ package control;
 
 public class Control {
 	// source file
-	public static String fileName = null;
+	public static String fileName = "";
 
 	// compiler testing and debugging
 	public static boolean testlexer = false;

@@ -70,4 +70,24 @@ public interface Visitor {
 
 	// and
 	public void visit(Iand iand);
+
+	// arraySelect
+	public void visit(Iaload iaload);
+
+	// boolean
+	public void visit(Ixor xor);
+
+	// arrayAssign
+	public void visit(Iastore iastore);
+
+	// if zero
+	public void visit(Ifeq ifeq);
+
+	// use field
+	public void visit(Getfield getfield);
+
+	// change field
+	public void visit(Putfield putfield);
+
+	public void visit(codegen.bytecode.type.Boolean boolean1);
 }

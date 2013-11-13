@@ -7,7 +7,6 @@ import lexer.Lexer;
 import lexer.Token;
 import lexer.Token.Kind;
 import parser.Parser;
-import control.CommandLine;
 import control.Control;
 import control.Control.Codegen_Kind_t;
 
@@ -22,7 +21,7 @@ public class Tiger {
 		// CommandLine cmd = new CommandLine();
 		// String fname = cmd.scan(args);
 
-		String fname = "test/TreeVisitor.java";
+		String fname = "test/javaSrc/TreeVisitor.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -57,7 +56,8 @@ public class Tiger {
 		// cmd.usage();
 		// return;
 		// }
-		Control.fileName = fname;
+
+		Control.fileName = fname.substring(fname.lastIndexOf("/") + 1);
 
 		// /////////////////////////////////////////////////////
 		// it would be helpful to be able to test the lexer
@@ -106,20 +106,22 @@ public class Tiger {
 		elaborator.ElaboratorVisitor elab = new elaborator.ElaboratorVisitor();
 		theAst.accept(elab);
 
+		codegen.bytecode.PrettyPrintVisitor ppbc = null;
+		codegen.C.PrettyPrintVisitor ppc = null;
 		// code generation
 		switch (control.Control.codegen) {
 		case Bytecode:
 			codegen.bytecode.TranslateVisitor trans = new codegen.bytecode.TranslateVisitor();
 			theAst.accept(trans);
 			codegen.bytecode.program.T bytecodeAst = trans.program;
-			codegen.bytecode.PrettyPrintVisitor ppbc = new codegen.bytecode.PrettyPrintVisitor();
+			ppbc = new codegen.bytecode.PrettyPrintVisitor();
 			bytecodeAst.accept(ppbc);
 			break;
 		case C:
 			codegen.C.TranslateVisitor transC = new codegen.C.TranslateVisitor();
 			theAst.accept(transC);
 			codegen.C.program.T cAst = transC.program;
-			codegen.C.PrettyPrintVisitor ppc = new codegen.C.PrettyPrintVisitor();
+			ppc = new codegen.C.PrettyPrintVisitor();
 			cAst.accept(ppc);
 			break;
 		case X86:
@@ -133,17 +135,31 @@ public class Tiger {
 		// call gcc to compile the generated C or x86
 		// file, or call java to run the bytecode file.
 		// Your code:
+		Runtime run = Runtime.getRuntime();
 		if (control.Control.codegen == Codegen_Kind_t.C) {
-			Runtime run = Runtime.getRuntime();
 			try {
-				run.exec("gcc -c " + fname + ".c -o " + fname + ".o");
-				run.exec("gcc " + fname + ".c  runtime/runtime.c -o " + fname
+				String file = "test/ccodeTest/" + Control.fileName;
+				// run.exec("gcc -c " + fname + ".c -o " + fname + ".o");
+				run.exec("gcc " + file + ".c  runtime/runtime.c -o " + file
 						+ ".exe");
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			return;
+		} else if (control.Control.codegen == Codegen_Kind_t.Bytecode) {
+			try {
+				for (int i = 0; i < ppbc.jNames.size(); i++) {
+					run.exec("java -jar jasmin.jar " + ppbc.jNames.get(i)
+							+ " -d test/bytecodeTest");
+				}
+				// String[] ss=ppbc.jNames.get(0).split("\\.");
+				// the regex . can present any character,so use "\\."
+				// run.exec("java " + ppbc.jNames.get(0).split("\\.")[0]);
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 	}
 }

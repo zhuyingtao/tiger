@@ -53,14 +53,20 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.ArraySelect e) {
+		// get x[1] : x is an int array stored in local variable 1
+		// aload 1 ; ldc 1 ; iaload
+		e.array.accept(this);
+		e.index.accept(this);
+		emit(new codegen.bytecode.stm.Iaload());
 	}
 
 	@Override
 	public void visit(ast.exp.Call e) {
 		e.exp.accept(this);
-		for (ast.exp.T x : e.args) {
-			x.accept(this);
-		}
+		if (e.args != null)
+			for (ast.exp.T x : e.args) {
+				x.accept(this);
+			}
 		e.rt.accept(this);
 		codegen.bytecode.type.T rt = this.type;
 		java.util.LinkedList<codegen.bytecode.type.T> at = new java.util.LinkedList<codegen.bytecode.type.T>();
@@ -74,22 +80,36 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.False e) {
+		emit(new codegen.bytecode.stm.Ldc(0));
 	}
 
 	@Override
 	public void visit(ast.exp.Id e) {
-		int index = this.indexTable.get(e.id);
-		ast.type.T type = e.type;
-		if (type.getNum() > 0)// a reference
-			emit(new codegen.bytecode.stm.Aload(index));
-		else
-			emit(new codegen.bytecode.stm.Iload(index));
-		// but what about this is a field?
+		if (!e.isField) {
+			int index = this.indexTable.get(e.id);
+			ast.type.T type = e.type;
+			if (type.getNum() > 0)// a reference
+				emit(new codegen.bytecode.stm.Aload(index));
+			else
+				emit(new codegen.bytecode.stm.Iload(index));
+		} else {
+			// but what about this is a field?
+			// If it is a field,we do the following:
+
+			// it seems that Mini_Java only supports id ,but not class.id
+			// so it could only use the field of "this" class ?
+			emit(new codegen.bytecode.stm.Aload(0));// get "this" instance
+			String location = this.classId + "/" + e.id;
+			String type = e.type.toString();
+			emit(new codegen.bytecode.stm.Getfield(location, type));
+		}
 		return;
 	}
 
 	@Override
 	public void visit(ast.exp.Length e) {
+		e.array.accept(this);
+		emit(new codegen.bytecode.stm.Arraylength());
 	}
 
 	@Override
@@ -103,13 +123,14 @@ public class TranslateVisitor implements ast.Visitor {
 		emit(new codegen.bytecode.stm.Goto(el));
 		emit(new codegen.bytecode.stm.Label(tl));
 		emit(new codegen.bytecode.stm.Ldc(1));
-		emit(new codegen.bytecode.stm.Goto(el));
 		emit(new codegen.bytecode.stm.Label(el));
 		return;
 	}
 
 	@Override
 	public void visit(ast.exp.NewIntArray e) {
+		e.exp.accept(this);
+		emit(new codegen.bytecode.stm.NewArray());
 	}
 
 	@Override
@@ -120,6 +141,10 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Not e) {
+		// does it has an instruction to operate this?
+		e.exp.accept(this);
+		emit(new codegen.bytecode.stm.Ldc(1));
+		emit(new codegen.bytecode.stm.Ixor());
 	}
 
 	@Override
@@ -138,6 +163,7 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.This e) {
+		// the index 0 of the table stores the "this" objectref
 		emit(new codegen.bytecode.stm.Aload(0));
 		return;
 	}
@@ -152,29 +178,52 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.True e) {
+		emit(new codegen.bytecode.stm.Ldc(1));
 	}
 
 	// statements
 	@Override
 	public void visit(ast.stm.Assign s) {
-		s.exp.accept(this);
-		int index = this.indexTable.get(s.id);
-		ast.type.T type = s.type;
-		if (type.getNum() > 0)
-			emit(new codegen.bytecode.stm.Astore(index));
-		else
-			emit(new codegen.bytecode.stm.Istore(index));
-
+		// this need to check whether the id is a local variable or a field
+		if (!s.idIsField) {
+			s.exp.accept(this);
+			int index = this.indexTable.get(s.id);
+			ast.type.T type = s.type;
+			if (type.getNum() > 0)
+				emit(new codegen.bytecode.stm.Astore(index));
+			else
+				emit(new codegen.bytecode.stm.Istore(index));
+		} else {
+			emit(new codegen.bytecode.stm.Aload(0));// get "this" instance
+			s.exp.accept(this);
+			String location = this.classId + "/" + s.id;
+			String type = s.type.toString();
+			emit(new codegen.bytecode.stm.Putfield(location, type));
+		}
 		return;
 	}
 
 	@Override
 	public void visit(ast.stm.AssignArray s) {
-		s.exp.accept(this);
-		int index = this.indexTable.get(s.id);
-		s.index.accept(this);
-		emit(new codegen.bytecode.stm.Istore(index));
-
+		// this need to check whether the id is a local variable or a field
+		if (!s.idIsField) {
+			// the stack order is: arrayref,index,value
+			// Once execute "iastore",the stack will empty
+			int aindex = this.indexTable.get(s.id);
+			// the type of the array only supports "int"
+			emit(new codegen.bytecode.stm.Aload(aindex));
+			s.index.accept(this);
+			s.exp.accept(this);
+			emit(new codegen.bytecode.stm.Iastore());
+		} else {
+			emit(new codegen.bytecode.stm.Aload(0));// get "this" instance
+			String location = this.classId + "/" + s.id;
+			String type = "@int[]";
+			emit(new codegen.bytecode.stm.Getfield(location, type));
+			s.index.accept(this);
+			s.exp.accept(this);
+			emit(new codegen.bytecode.stm.Iastore());
+		}
 	}
 
 	@Override
@@ -186,15 +235,25 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.If s) {
-		Label tl = new Label(), fl = new Label(), el = new Label();
+		// tl is true label,fl is false label,el is end label
+		// Label tl = new Label();
+		Label fl = new Label();
+		Label el = new Label();
 		s.condition.accept(this);
-		emit(new codegen.bytecode.stm.Ifne(tl));
-		emit(new codegen.bytecode.stm.Label(fl));
-		s.elsee.accept(this);
-		emit(new codegen.bytecode.stm.Goto(el));
-		emit(new codegen.bytecode.stm.Label(tl));
+		// emit(new codegen.bytecode.stm.Ifne(tl)); // if true
+		// emit(new codegen.bytecode.stm.Label(fl));
+		// s.elsee.accept(this);
+		// emit(new codegen.bytecode.stm.Goto(el));
+		// emit(new codegen.bytecode.stm.Label(tl));
+		// s.thenn.accept(this);
+		// emit(new codegen.bytecode.stm.Goto(el));
+		// emit(new codegen.bytecode.stm.Label(el));
+
+		emit(new codegen.bytecode.stm.Ifeq(fl)); // if false
 		s.thenn.accept(this);
 		emit(new codegen.bytecode.stm.Goto(el));
+		emit(new codegen.bytecode.stm.Label(fl));
+		s.elsee.accept(this);
 		emit(new codegen.bytecode.stm.Label(el));
 		return;
 	}
@@ -208,12 +267,21 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.While s) {
+		// ifne:if value not equals 0, then goto.that is the true condition
+		// but here I think use the "ifeq" easier
+		Label end = new Label(), start = new Label();
+		emit(new codegen.bytecode.stm.Label(start));
+		s.condition.accept(this);
+		emit(new codegen.bytecode.stm.Ifeq(end));// while false,goto end
+		s.body.accept(this);
+		emit(new codegen.bytecode.stm.Goto(start));
+		emit(new codegen.bytecode.stm.Label(end));
 	}
 
 	// type
 	@Override
 	public void visit(ast.type.Boolean t) {
-
+		this.type = new codegen.bytecode.type.Boolean();
 	}
 
 	@Override
@@ -236,7 +304,10 @@ public class TranslateVisitor implements ast.Visitor {
 	public void visit(ast.dec.Dec d) {
 		d.type.accept(this);
 		this.dec = new codegen.bytecode.dec.Dec(this.type, d.id);
-		this.indexTable.put(d.id, index++);
+		// Although when visiting the class,the fields use indexTable here,but
+		// it is useless¡£When isiting a method,it new a indexTable
+		if (this.indexTable != null)
+			this.indexTable.put(d.id, index++);
 		return;
 	}
 
