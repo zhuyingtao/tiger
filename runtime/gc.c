@@ -8,11 +8,11 @@ void *Tiger_new (void *vtable, int size)
 {
   // You should write 4 statements for this function.
   // #1: "malloc" a chunk of memory of size "size":
-  int* object=(int*)malloc(size);
+  
   // #2: clear this chunk of memory (zero off it):
-  memset(object,0,size);
+  
   // #3: set up the "vtable" pointer properly:
-  *object=(int) vtable;
+  
   // #4: return the pointer 
-  return object;
+  
 }

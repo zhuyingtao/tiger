@@ -8,12 +8,6 @@ public class Not extends T
   {
     this.exp = exp;
   }
-  
-  public Not(T exp,int lineNum)
-  {
-    this.exp = exp;
-    this.lineNum=lineNum;
-  }
 
   @Override
   public void accept(ast.Visitor v)

@@ -6,18 +6,11 @@ public class Assign extends T
 {
   public String id;
   public codegen.C.exp.T exp;
-  
-  public boolean idIsField;
 
   public Assign(String id, codegen.C.exp.T exp)
   {
     this.id = id;
     this.exp = exp;
-  }
-  
-  public Assign(String id,codegen.C.exp.T exp,boolean idIsField){
-	  this(id, exp);
-	  this.idIsField=idIsField;
   }
 
   @Override
