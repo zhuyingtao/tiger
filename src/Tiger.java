@@ -124,6 +124,13 @@ public class Tiger {
 			ppc = new codegen.C.PrettyPrintVisitor();
 			cAst.accept(ppc);
 			break;
+		case Dalvik:
+			codegen.dalvik.TranslateVisitor transDalvik = new codegen.dalvik.TranslateVisitor();
+			theAst.accept(transDalvik);
+			codegen.dalvik.program.T dalvikAst = transDalvik.program;
+			codegen.dalvik.PrettyPrintVisitor ppDalvik = new codegen.dalvik.PrettyPrintVisitor();
+			dalvikAst.accept(ppDalvik);
+			break;
 		case X86:
 			// similar
 			break;

@@ -22,7 +22,7 @@ public class Control {
 	public static String outputName = null;
 
 	public enum Codegen_Kind_t {
-		Bytecode, C, X86
+		Bytecode, C, X86, Dalvik
 	}
 
 	public static Codegen_Kind_t codegen = Codegen_Kind_t.C;
