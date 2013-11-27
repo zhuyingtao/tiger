@@ -266,18 +266,35 @@ public class TranslateVisitor implements ast.Visitor {
 		this.tmpVars = new java.util.LinkedList<codegen.C.dec.T>();
 		m.retType.accept(this);
 		codegen.C.type.T newRetType = this.type;
+
 		java.util.LinkedList<codegen.C.dec.T> newFormals = new java.util.LinkedList<codegen.C.dec.T>();
 		newFormals.add(new codegen.C.dec.Dec(new codegen.C.type.Class(
 				this.classId), "this"));
+		// initial the arguments GC map with "1" presented "this"
+		StringBuffer aString = new StringBuffer("1");
+
 		for (ast.dec.T d : m.formals) {
 			d.accept(this);
+			if (this.type instanceof codegen.C.type.Class
+					|| this.type instanceof codegen.C.type.IntArray)
+				aString.append("1");
+			else
+				aString.append("0");
 			newFormals.add(this.dec);
 		}
+
 		java.util.LinkedList<codegen.C.dec.T> locals = new java.util.LinkedList<codegen.C.dec.T>();
+		StringBuffer lString = new StringBuffer();
 		for (ast.dec.T d : m.locals) {
 			d.accept(this);
+			if (this.type instanceof codegen.C.type.Class
+					|| this.type instanceof codegen.C.type.IntArray)
+				lString.append("1");
+			else
+				lString.append("0");
 			locals.add(this.dec);
 		}
+
 		java.util.LinkedList<codegen.C.stm.T> newStm = new java.util.LinkedList<codegen.C.stm.T>();
 		for (ast.stm.T s : m.stms) {
 			s.accept(this);
@@ -286,10 +303,15 @@ public class TranslateVisitor implements ast.Visitor {
 		m.retExp.accept(this);
 		codegen.C.exp.T retExp = this.exp;
 		for (codegen.C.dec.T dec : this.tmpVars) {
+			if (((codegen.C.dec.Dec) dec).type instanceof codegen.C.type.Class
+					|| ((codegen.C.dec.Dec) dec).type instanceof codegen.C.type.IntArray)
+				lString.append("1");
+			else
+				lString.append("0");
 			locals.add(dec);
 		}
 		this.method = new codegen.C.method.Method(newRetType, this.classId,
-				m.id, newFormals, locals, newStm, retExp);
+				m.id, newFormals, locals, newStm, retExp, aString, lString);
 		return;
 	}
 

@@ -54,7 +54,8 @@ public class TranslateVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.exp.ArraySelect e) {
 		// get x[1] : x is an int array stored in local variable 1
-		// aload 1 ; ldc 1 ; iaload
+		// aload 1 ; ldc 1 ; ialoadr
+		// if x is an field array,use getfield
 		e.array.accept(this);
 		e.index.accept(this);
 		emit(new codegen.bytecode.stm.Iaload());
@@ -96,7 +97,7 @@ public class TranslateVisitor implements ast.Visitor {
 			// but what about this is a field?
 			// If it is a field,we do the following:
 
-			// it seems that Mini_Java only supports id ,but not class.id
+			// it seems that Mini_Java only supports "id" ,but not "class.id"
 			// so it could only use the field of "this" class ?
 			emit(new codegen.bytecode.stm.Aload(0));// get "this" instance
 			String location = this.classId + "/" + e.id;
@@ -141,7 +142,9 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Not e) {
-		// does it has an instruction to operate this?
+		// does it have an instruction to operate NOT directly?
+		// NO! the JVM uses "ifne" then goto to operate NOT,
+		// but I think the following is easier.
 		e.exp.accept(this);
 		emit(new codegen.bytecode.stm.Ldc(1));
 		emit(new codegen.bytecode.stm.Ixor());
@@ -267,7 +270,7 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.While s) {
-		// ifne:if value not equals 0, then goto.that is the true condition
+		// ifne:if value not equals 0, then goto.Thus this is the true condition
 		// but here I think use the "ifeq" easier
 		Label end = new Label(), start = new Label();
 		emit(new codegen.bytecode.stm.Label(start));
@@ -305,7 +308,7 @@ public class TranslateVisitor implements ast.Visitor {
 		d.type.accept(this);
 		this.dec = new codegen.bytecode.dec.Dec(this.type, d.id);
 		// Although when visiting the class,the fields use indexTable here,but
-		// it is useless¡£When isiting a method,it new a indexTable
+		// it is useless¡£When visiting a method,it new a indexTable again.
 		if (this.indexTable != null)
 			this.indexTable.put(d.id, index++);
 		return;
