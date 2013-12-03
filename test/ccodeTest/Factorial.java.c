@@ -3,14 +3,21 @@
 
 #define NULL ((void*)0)
 
+#include <string.h>
 // structures
 struct Factorial
 {
   struct Factorial_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 struct Fac
 {
   struct Fac_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 
 // vtables structures
@@ -34,7 +41,7 @@ struct Fac_vtable Fac_vtable_ ;
 struct Fac_ComputeFac_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Fac * x_1;
 };
@@ -44,21 +51,23 @@ void *prev;
 int Fac_ComputeFac(struct Fac * this, int num)
 {
   struct Fac_ComputeFac_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Fac_ComputeFac_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 1;
+
   int num_aux;
-  struct Fac * x_1;
-  frame.x_1 = x_1;
 
   if (num < 1){
     num_aux = 1;
 
   }else{
-    num_aux = num * (x_1=this, x_1->vptr->ComputeFac(x_1, num - 1));
+    num_aux = num * (frame.x_1=this, frame.x_1->vptr->ComputeFac(frame.x_1, num - 1));
   }
+  prev=frame.prev;
   return num_aux;
 }
 
@@ -66,21 +75,38 @@ int Fac_ComputeFac(struct Fac * this, int num)
 // vtables
 struct Factorial_vtable Factorial_vtable_ = 
 {
-  NULL,
+  "",
 };
 
 struct Fac_vtable Fac_vtable_ = 
 {
-  NULL,
+  "",
   Fac_ComputeFac,
 };
 
 
 // main method
+struct main_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
+  struct Fac * x_0;
+};
+void *prev;
 int Tiger_main ()
 {
-  struct Fac * x_0;
-  System_out_println ((x_0=((struct Fac*)(Tiger_new (&Fac_vtable_, sizeof(struct Fac)))), x_0->vptr->ComputeFac(x_0, 10)));
+  struct  main_gc_frame frame;
+
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = NULL;
+  frame.arguments_base_address = 0;
+  frame.locals_gc_map = 1;
+
+  System_out_println ((frame.x_0=((struct Fac*)(Tiger_new (&Fac_vtable_, sizeof(struct Fac)))), frame.x_0->vptr->ComputeFac(frame.x_0, 10)));
+
+  prev=frame.prev;
 }
 
 

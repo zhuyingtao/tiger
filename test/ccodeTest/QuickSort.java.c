@@ -3,14 +3,21 @@
 
 #define NULL ((void*)0)
 
+#include <string.h>
 // structures
 struct QuickSort
 {
   struct QuickSort_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 struct QS
 {
   struct QS_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   int*   number;
   int size;
 };
@@ -39,7 +46,7 @@ struct QS_vtable QS_vtable_ ;
 struct QS_Start_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct QS * x_1;
   struct QS * x_2;
@@ -52,34 +59,30 @@ void *prev;
 int QS_Start(struct QS * this, int sz)
 {
   struct QS_Start_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = QS_Start_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 4;
-  int aux01;
-  struct QS * x_1;
-  frame.x_1 = x_1;
-  struct QS * x_2;
-  frame.x_2 = x_2;
-  struct QS * x_3;
-  frame.x_3 = x_3;
-  struct QS * x_4;
-  frame.x_4 = x_4;
 
-  aux01 = (x_1=this, x_1->vptr->Init(x_1, sz));
-  aux01 = (x_2=this, x_2->vptr->Print(x_2));
+  int aux01;
+
+  aux01 = (frame.x_1=this, frame.x_1->vptr->Init(frame.x_1, sz));
+  aux01 = (frame.x_2=this, frame.x_2->vptr->Print(frame.x_2));
   System_out_println (9999);
   aux01 = this->size - 1;
-  aux01 = (x_3=this, x_3->vptr->Sort(x_3, 0, aux01));
-  aux01 = (x_4=this, x_4->vptr->Print(x_4));
+  aux01 = (frame.x_3=this, frame.x_3->vptr->Sort(frame.x_3, 0, aux01));
+  aux01 = (frame.x_4=this, frame.x_4->vptr->Print(frame.x_4));
+  prev=frame.prev;
   return 0;
 }
 
 struct QS_Sort_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct QS * x_5;
   struct QS * x_6;
@@ -90,11 +93,14 @@ void *prev;
 int QS_Sort(struct QS * this, int left, int right)
 {
   struct QS_Sort_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = QS_Sort_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 2;
+
   int v;
   int i;
   int j;
@@ -103,10 +109,6 @@ int QS_Sort(struct QS * this, int left, int right)
   int cont01;
   int cont02;
   int aux03;
-  struct QS * x_5;
-  frame.x_5 = x_5;
-  struct QS * x_6;
-  frame.x_6 = x_6;
 
   t = 0;
   if (left < right){
@@ -153,19 +155,20 @@ int QS_Sort(struct QS * this, int left, int right)
     this->number[j] = this->number[i];
     this->number[i] = this->number[right];
     this->number[right] = t;
-    nt = (x_5=this, x_5->vptr->Sort(x_5, left, i - 1));
-    nt = (x_6=this, x_6->vptr->Sort(x_6, i+1, right));
+    nt = (frame.x_5=this, frame.x_5->vptr->Sort(frame.x_5, left, i - 1));
+    nt = (frame.x_6=this, frame.x_6->vptr->Sort(frame.x_6, i+1, right));
 
   }else{
     nt = 0;
   }
+  prev=frame.prev;
   return 0;
 }
 
 struct QS_Print_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *QS_Print_arguments_gc_map="1";
@@ -174,11 +177,14 @@ void *prev;
 int QS_Print(struct QS * this)
 {
   struct QS_Print_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = QS_Print_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int j;
 
   j = 0;
@@ -187,13 +193,14 @@ int QS_Print(struct QS * this)
     System_out_println (this->number[j]);
     j = j+1;
   }
+  prev=frame.prev;
   return 0;
 }
 
 struct QS_Init_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *QS_Init_arguments_gc_map="10";
@@ -202,14 +209,17 @@ void *prev;
 int QS_Init(struct QS * this, int sz)
 {
   struct QS_Init_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = QS_Init_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->size = sz;
-  this->number = (int*)Tiger_new_array(sz);
+  this->number = (int *)Tiger_new_array(sz);
   this->number[0] = 20;
   this->number[1] = 7;
   this->number[2] = 12;
@@ -220,6 +230,7 @@ int QS_Init(struct QS * this, int sz)
   this->number[7] = 9;
   this->number[8] = 19;
   this->number[9] = 5;
+  prev=frame.prev;
   return 0;
 }
 
@@ -227,7 +238,7 @@ int QS_Init(struct QS * this, int sz)
 // vtables
 struct QuickSort_vtable QuickSort_vtable_ = 
 {
-  NULL,
+  "",
 };
 
 struct QS_vtable QS_vtable_ = 
@@ -241,10 +252,27 @@ struct QS_vtable QS_vtable_ =
 
 
 // main method
+struct main_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
+  struct QS * x_0;
+};
+void *prev;
 int Tiger_main ()
 {
-  struct QS * x_0;
-  System_out_println ((x_0=((struct QS*)(Tiger_new (&QS_vtable_, sizeof(struct QS)))), x_0->vptr->Start(x_0, 10)));
+  struct  main_gc_frame frame;
+
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = NULL;
+  frame.arguments_base_address = 0;
+  frame.locals_gc_map = 1;
+
+  System_out_println ((frame.x_0=((struct QS*)(Tiger_new (&QS_vtable_, sizeof(struct QS)))), frame.x_0->vptr->Start(frame.x_0, 10)));
+
+  prev=frame.prev;
 }
 
 

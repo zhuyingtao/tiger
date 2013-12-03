@@ -7,6 +7,7 @@ import lexer.Lexer;
 import lexer.Token;
 import lexer.Token.Kind;
 import parser.Parser;
+import control.CommandLine;
 import control.Control;
 import control.Control.Codegen_Kind_t;
 
@@ -16,12 +17,12 @@ public class Tiger {
 		InputStream fstream;
 		Parser parser;
 
-		// ///////////////////////////////////////////////////////
+		// /////////////////////////////////////////////////////
 		// handle command line arguments
-		// CommandLine cmd = new CommandLine();
-		// String fname = cmd.scan(args);
+		CommandLine cmd = new CommandLine();
+		String fname = cmd.scan(args);
 
-		String fname = "test/javaSrc/BinarySearch.java";
+		// String fname = "test/javaSrc/TreeVisitor.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -52,10 +53,10 @@ public class Tiger {
 			System.exit(1);
 		}
 
-		// if (fname == null) {
-		// cmd.usage();
-		// return;
-		// }
+		if (fname == null) {
+			cmd.usage();
+			return;
+		}
 
 		Control.fileName = fname.substring(fname.lastIndexOf("/") + 1);
 
@@ -146,7 +147,6 @@ public class Tiger {
 		if (control.Control.codegen == Codegen_Kind_t.C) {
 			try {
 				String file = "test/ccodeTest/" + Control.fileName;
-				// run.exec("gcc -c " + fname + ".c -o " + fname + ".o");
 				run.exec("gcc " + file + ".c  runtime/runtime.c -o " + file
 						+ ".exe");
 			} catch (IOException e) {

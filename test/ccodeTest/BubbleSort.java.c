@@ -3,14 +3,21 @@
 
 #define NULL ((void*)0)
 
+#include <string.h>
 // structures
 struct BubbleSort
 {
   struct BubbleSort_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 struct BBS
 {
   struct BBS_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   int*   number;
   int size;
 };
@@ -39,7 +46,7 @@ struct BBS_vtable BBS_vtable_ ;
 struct BBS_Start_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct BBS * x_1;
   struct BBS * x_2;
@@ -52,11 +59,14 @@ void *prev;
 int BBS_Start(struct BBS * this, int sz)
 {
   struct BBS_Start_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = BBS_Start_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 4;
+
   int aux01;
 
   aux01 = (frame.x_1=this, frame.x_1->vptr->Init(frame.x_1, sz));
@@ -64,13 +74,14 @@ int BBS_Start(struct BBS * this, int sz)
   System_out_println (99999);
   aux01 = (frame.x_3=this, frame.x_3->vptr->Sort(frame.x_3));
   aux01 = (frame.x_4=this, frame.x_4->vptr->Print(frame.x_4));
+  prev=frame.prev;
   return 0;
 }
 
 struct BBS_Sort_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *BBS_Sort_arguments_gc_map="1";
@@ -79,11 +90,14 @@ void *prev;
 int BBS_Sort(struct BBS * this)
 {
   struct BBS_Sort_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = BBS_Sort_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int nt;
   int i;
   int aux02;
@@ -117,13 +131,14 @@ int BBS_Sort(struct BBS * this)
     }
     i = i - 1;
   }
+  prev=frame.prev;
   return 0;
 }
 
 struct BBS_Print_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *BBS_Print_arguments_gc_map="1";
@@ -132,11 +147,14 @@ void *prev;
 int BBS_Print(struct BBS * this)
 {
   struct BBS_Print_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = BBS_Print_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int j;
 
   j = 0;
@@ -145,13 +163,14 @@ int BBS_Print(struct BBS * this)
     System_out_println (this->number[j]);
     j = j+1;
   }
+  prev=frame.prev;
   return 0;
 }
 
 struct BBS_Init_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *BBS_Init_arguments_gc_map="10";
@@ -160,14 +179,17 @@ void *prev;
 int BBS_Init(struct BBS * this, int sz)
 {
   struct BBS_Init_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = BBS_Init_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->size = sz;
-  this->number = (int*)Tiger_new_array(sz);
+  this->number = (int *)Tiger_new_array(sz);
   this->number[0] = 20;
   this->number[1] = 7;
   this->number[2] = 12;
@@ -178,6 +200,7 @@ int BBS_Init(struct BBS * this, int sz)
   this->number[7] = 9;
   this->number[8] = 19;
   this->number[9] = 5;
+  prev=frame.prev;
   return 0;
 }
 
@@ -185,7 +208,7 @@ int BBS_Init(struct BBS * this, int sz)
 // vtables
 struct BubbleSort_vtable BubbleSort_vtable_ = 
 {
-  NULL,
+  "",
 };
 
 struct BBS_vtable BBS_vtable_ = 
@@ -202,7 +225,7 @@ struct BBS_vtable BBS_vtable_ =
 struct main_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct BBS * x_0;
 };
@@ -210,12 +233,16 @@ void *prev;
 int Tiger_main ()
 {
   struct  main_gc_frame frame;
+
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = NULL;
   frame.arguments_base_address = 0;
   frame.locals_gc_map = 1;
+
   System_out_println ((frame.x_0=((struct BBS*)(Tiger_new (&BBS_vtable_, sizeof(struct BBS)))), frame.x_0->vptr->Start(frame.x_0, 10)));
+
+  prev=frame.prev;
 }
 
 

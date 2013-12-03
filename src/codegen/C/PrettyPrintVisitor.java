@@ -108,9 +108,6 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(codegen.C.exp.Length e) {
-		// this.say("sizeof(");
-		// e.array.accept(this);
-		// this.say(")");
 		this.say("Length(");
 		e.array.accept(this);
 		this.say(")");
@@ -126,11 +123,7 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(codegen.C.exp.NewIntArray e) {
-		// this.say("(int*) malloc(sizeof(int)*");
-		// e.exp.accept(this);
-		// this.say(")");
-		// this.say("(int*)Array_new(");
-		this.say("(int*)Tiger_new_array(");
+		this.say("(int *)Tiger_new_array(");
 		e.exp.accept(this);
 		this.say(")");
 	}
@@ -323,9 +316,6 @@ public class PrettyPrintVisitor implements Visitor {
 		lString = m.lString.toString();
 		for (codegen.C.dec.T d : m.locals) {
 			codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
-			// this.say("  ");
-			// dec.type.accept(this);
-			// this.say(" " + dec.id + ";\n");
 			if (dec.type instanceof codegen.C.type.Class
 					|| dec.type instanceof codegen.C.type.IntArray) {
 				// this.sayln("  frame." + dec.id + " = " + dec.id+";");
@@ -341,12 +331,15 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("");
 		for (codegen.C.stm.T s : m.stms)
 			s.accept(this);
+
+		// don't forget to pop off the GC stack frame just before the return
+		// statement.
+		this.popGCStack();
 		this.say("  return ");
 		m.retExp.accept(this);
 		this.sayln(";");
 		this.sayln("}\n");
-		// don't forget to pop off the GC stack frame just before the return
-		// statement.
+
 		return;
 	}
 
@@ -356,7 +349,7 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("struct main_gc_frame{");
 		this.sayln("  void *prev;");
 		this.sayln("  char *arguments_gc_map;");
-		this.sayln("  int *arguments_base_address;");
+		this.sayln("  void *arguments_base_address;");
 		this.sayln("  int locals_gc_map;");
 		for (codegen.C.dec.T d : m.locals) {
 			codegen.C.dec.Dec dec = (codegen.C.dec.Dec) d;
@@ -386,6 +379,8 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("  frame.arguments_base_address = 0;");
 		this.sayln("  frame.locals_gc_map = " + m.locals.size() + ";\n");
 		m.stm.accept(this);
+		this.sayln("");
+		this.popGCStack();
 		this.sayln("}\n");
 		return;
 	}
@@ -417,7 +412,7 @@ public class PrettyPrintVisitor implements Visitor {
 		// initialize the class gc map;
 		String fString = fStrings.get(v.id);
 		if (fString.equals(""))
-			this.sayln("  NULL,");
+			this.sayln("  \"\",");
 		else
 			this.sayln("  \"" + fString + "\",");
 
@@ -440,7 +435,12 @@ public class PrettyPrintVisitor implements Visitor {
 		String fString = "";
 		this.sayln("struct " + c.id);
 		this.sayln("{");
+		// as each struct has a header with four words,we should add them
+		// manual;
 		this.sayln("  struct " + c.id + "_vtable *vptr;");
+		this.sayln("  int isObjOrArray;");
+		this.sayln("  int length;");
+		this.sayln("  void *forwarding;");
 
 		for (codegen.C.Tuple t : c.decs) {
 			if (t.type instanceof codegen.C.type.Class
@@ -483,7 +483,8 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("// Do NOT modify!\n");
 
 		this.sayln("#define NULL ((void*)0)\n");
-
+		this.sayln("#include <string.h>");
+		
 		this.sayln("// structures");
 		for (codegen.C.classs.T c : p.classes) {
 			c.accept(this);
@@ -548,7 +549,7 @@ public class PrettyPrintVisitor implements Visitor {
 		// should be assigned the value of "f_arguments_gc_map"
 		this.sayln("  char *arguments_gc_map;");
 		// address of the first argument
-		this.sayln("  int *arguments_base_address;");
+		this.sayln("  void *arguments_base_address;");
 		// should be assigned the value of "f_locals_gc_map"
 		// this.sayln("  char *locals_gc_map;");
 		this.sayln("  int locals_gc_map;");
@@ -573,17 +574,23 @@ public class PrettyPrintVisitor implements Visitor {
 		this.sayln("  struct " + methodName + "_gc_frame frame;\n");
 
 		// push this frame onto the GC stack by setting up "prev"
+		this.sayln("  memset(&frame,0,sizeof(frame));");
 		this.sayln("  frame.prev = prev;");
 		this.sayln("  prev = &frame;");
 
 		// setting up memory GC maps and corresponding base addresses
 		this.sayln("  frame.arguments_gc_map = " + methodName
 				+ "_arguments_gc_map;");
-		this.sayln("  frame.arguments_base_address =(int*) &this;");
+		this.sayln("  frame.arguments_base_address =&this;");
 		// this.sayln("  frame.locals_gc_map = " + methodName +
 		// "_locals_gc_map;");
 		this.sayln("  frame.locals_gc_map = "
 				+ this.countLocalRefs(m.lString.toString()) + ";\n");
+	}
+
+	public void popGCStack() {
+		this.sayln("  prev=frame.prev;");
+		// this.sayln("  frame = NULL ;"); //how to pop off GC stack?
 	}
 
 	public int countLocalRefs(String s) {

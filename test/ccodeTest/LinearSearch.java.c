@@ -3,14 +3,21 @@
 
 #define NULL ((void*)0)
 
+#include <string.h>
 // structures
 struct LinearSearch
 {
   struct LinearSearch_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 struct LS
 {
   struct LS_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   int*   number;
   int size;
 };
@@ -39,7 +46,7 @@ struct LS_vtable LS_vtable_ ;
 struct LS_Start_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct LS * x_1;
   struct LS * x_2;
@@ -54,40 +61,32 @@ void *prev;
 int LS_Start(struct LS * this, int sz)
 {
   struct LS_Start_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = LS_Start_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 6;
+
   int aux01;
   int aux02;
-  struct LS * x_1;
-  frame.x_1 = x_1;
-  struct LS * x_2;
-  frame.x_2 = x_2;
-  struct LS * x_3;
-  frame.x_3 = x_3;
-  struct LS * x_4;
-  frame.x_4 = x_4;
-  struct LS * x_5;
-  frame.x_5 = x_5;
-  struct LS * x_6;
-  frame.x_6 = x_6;
 
-  aux01 = (x_1=this, x_1->vptr->Init(x_1, sz));
-  aux02 = (x_2=this, x_2->vptr->Print(x_2));
+  aux01 = (frame.x_1=this, frame.x_1->vptr->Init(frame.x_1, sz));
+  aux02 = (frame.x_2=this, frame.x_2->vptr->Print(frame.x_2));
   System_out_println (9999);
-  System_out_println ((x_3=this, x_3->vptr->Search(x_3, 8)));
-  System_out_println ((x_4=this, x_4->vptr->Search(x_4, 12)));
-  System_out_println ((x_5=this, x_5->vptr->Search(x_5, 17)));
-  System_out_println ((x_6=this, x_6->vptr->Search(x_6, 50)));
+  System_out_println ((frame.x_3=this, frame.x_3->vptr->Search(frame.x_3, 8)));
+  System_out_println ((frame.x_4=this, frame.x_4->vptr->Search(frame.x_4, 12)));
+  System_out_println ((frame.x_5=this, frame.x_5->vptr->Search(frame.x_5, 17)));
+  System_out_println ((frame.x_6=this, frame.x_6->vptr->Search(frame.x_6, 50)));
+  prev=frame.prev;
   return 55;
 }
 
 struct LS_Print_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *LS_Print_arguments_gc_map="1";
@@ -96,11 +95,14 @@ void *prev;
 int LS_Print(struct LS * this)
 {
   struct LS_Print_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = LS_Print_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int j;
 
   j = 1;
@@ -109,13 +111,14 @@ int LS_Print(struct LS * this)
     System_out_println (this->number[j]);
     j = j+1;
   }
+  prev=frame.prev;
   return 0;
 }
 
 struct LS_Search_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *LS_Search_arguments_gc_map="10";
@@ -124,11 +127,14 @@ void *prev;
 int LS_Search(struct LS * this, int num)
 {
   struct LS_Search_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = LS_Search_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int j;
   int ls01;
   int ifound;
@@ -158,13 +164,14 @@ int LS_Search(struct LS * this, int num)
     }
     j = j+1;
   }
+  prev=frame.prev;
   return ifound;
 }
 
 struct LS_Init_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *LS_Init_arguments_gc_map="10";
@@ -173,18 +180,21 @@ void *prev;
 int LS_Init(struct LS * this, int sz)
 {
   struct LS_Init_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = LS_Init_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int j;
   int k;
   int aux01;
   int aux02;
 
   this->size = sz;
-  this->number = (int*)Tiger_new_array(sz);
+  this->number = (int *)Tiger_new_array(sz);
   j = 1;
   k = this->size+1;
   while (j < this->size)
@@ -195,6 +205,7 @@ int LS_Init(struct LS * this, int sz)
     j = j+1;
     k = k - 1;
   }
+  prev=frame.prev;
   return 0;
 }
 
@@ -202,7 +213,7 @@ int LS_Init(struct LS * this, int sz)
 // vtables
 struct LinearSearch_vtable LinearSearch_vtable_ = 
 {
-  NULL,
+  "",
 };
 
 struct LS_vtable LS_vtable_ = 
@@ -216,10 +227,27 @@ struct LS_vtable LS_vtable_ =
 
 
 // main method
+struct main_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
+  struct LS * x_0;
+};
+void *prev;
 int Tiger_main ()
 {
-  struct LS * x_0;
-  System_out_println ((x_0=((struct LS*)(Tiger_new (&LS_vtable_, sizeof(struct LS)))), x_0->vptr->Start(x_0, 10)));
+  struct  main_gc_frame frame;
+
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = NULL;
+  frame.arguments_base_address = 0;
+  frame.locals_gc_map = 1;
+
+  System_out_println ((frame.x_0=((struct LS*)(Tiger_new (&LS_vtable_, sizeof(struct LS)))), frame.x_0->vptr->Start(frame.x_0, 10)));
+
+  prev=frame.prev;
 }
 
 

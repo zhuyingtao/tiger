@@ -3,350 +3,399 @@
 
 #define NULL ((void*)0)
 
+#include <string.h>
 // structures
-struct BinarySearch {
-	struct BinarySearch_vtable *vptr;
+struct BinarySearch
+{
+  struct BinarySearch_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
-struct BS {
-	struct BS_vtable *vptr;
-	int* number;
-	int size;
+struct BS
+{
+  struct BS_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
+  int*   number;
+  int size;
 };
 
 // vtables structures
-struct BinarySearch_vtable {
-	char *BinarySearch_gc_map;
+struct BinarySearch_vtable
+{
+  char *BinarySearch_gc_map;
 };
 
-struct BS_vtable {
-	char *BS_gc_map;
-	int (*Start)();
-	int (*Search)();
-	int (*Div)();
-	int (*Compare)();
-	int (*Print)();
-	int (*Init)();
+struct BS_vtable
+{
+  char *BS_gc_map;
+  int (*Start)();
+  int (*Search)();
+  int (*Div)();
+  int (*Compare)();
+  int (*Print)();
+  int (*Init)();
 };
+
 
 // vtables declared
-struct BinarySearch_vtable BinarySearch_vtable_;
-struct BS_vtable BS_vtable_;
+struct BinarySearch_vtable BinarySearch_vtable_ ;
+struct BS_vtable BS_vtable_ ;
 
 // methods
-struct BS_Start_gc_frame {
-	void *prev;
-	char *arguments_gc_map;
-	int *arguments_base_address;
-	int locals_gc_map;
-	struct BS * x_1;
-	struct BS * x_2;
-	struct BS * x_3;
-	struct BS * x_4;
-	struct BS * x_5;
-	struct BS * x_6;
-	struct BS * x_7;
-	struct BS * x_8;
-	struct BS * x_9;
-	struct BS * x_10;
+struct BS_Start_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
+  struct BS * x_1;
+  struct BS * x_2;
+  struct BS * x_3;
+  struct BS * x_4;
+  struct BS * x_5;
+  struct BS * x_6;
+  struct BS * x_7;
+  struct BS * x_8;
+  struct BS * x_9;
+  struct BS * x_10;
 };
-char *BS_Start_arguments_gc_map = "10";
-char *BS_Start_locals_gc_map = "001111111111";
+char *BS_Start_arguments_gc_map="10";
+char *BS_Start_locals_gc_map="001111111111";
 void *prev;
-int BS_Start(struct BS * this, int sz) {
-	struct BS_Start_gc_frame frame;
+int BS_Start(struct BS * this, int sz)
+{
+  struct BS_Start_gc_frame frame;
 
-	frame.prev = prev;
-	prev = &frame;
-	frame.arguments_gc_map = BS_Start_arguments_gc_map;
-	frame.arguments_base_address = (int*) &this;
-	frame.locals_gc_map = 10;
+  memset(&frame,0,sizeof(frame));
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = BS_Start_arguments_gc_map;
+  frame.arguments_base_address =&this;
+  frame.locals_gc_map = 10;
 
-	int aux01;
-	int aux02;
+  int aux01;
+  int aux02;
 
-	aux01 = (frame.x_1 = this, frame.x_1->vptr->Init(frame.x_1, sz));
-	aux02 = (frame.x_2 = this, frame.x_2->vptr->Print(frame.x_2));
-	if ((frame.x_3 = this, frame.x_3->vptr->Search(frame.x_3, 8))) {
-		System_out_println(1);
+  aux01 = (frame.x_1=this, frame.x_1->vptr->Init(frame.x_1, sz));
+  aux02 = (frame.x_2=this, frame.x_2->vptr->Print(frame.x_2));
+  if ((frame.x_3=this, frame.x_3->vptr->Search(frame.x_3, 8))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	if ((frame.x_4 = this, frame.x_4->vptr->Search(frame.x_4, 19))) {
-		System_out_println(1);
+  }else{
+    System_out_println (0);
+  }
+  if ((frame.x_4=this, frame.x_4->vptr->Search(frame.x_4, 19))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	if ((frame.x_5 = this, frame.x_5->vptr->Search(frame.x_5, 20))) {
-		System_out_println(1);
+  }else{
+    System_out_println (0);
+  }
+  if ((frame.x_5=this, frame.x_5->vptr->Search(frame.x_5, 20))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	if ((frame.x_6 = this, frame.x_6->vptr->Search(frame.x_6, 21))) {
-		System_out_println(1);
+  }else{
+    System_out_println (0);
+  }
+  if ((frame.x_6=this, frame.x_6->vptr->Search(frame.x_6, 21))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	if ((frame.x_7 = this, frame.x_7->vptr->Search(frame.x_7, 37))) {
-		System_out_println(1);
+  }else{
+    System_out_println (0);
+  }
+  if ((frame.x_7=this, frame.x_7->vptr->Search(frame.x_7, 37))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	if ((frame.x_8 = this, frame.x_8->vptr->Search(frame.x_8, 38))) {
-		System_out_println(1);
+  }else{
+    System_out_println (0);
+  }
+  if ((frame.x_8=this, frame.x_8->vptr->Search(frame.x_8, 38))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	if ((frame.x_9 = this, frame.x_9->vptr->Search(frame.x_9, 39))) {
-		System_out_println(1);
+  }else{
+    System_out_println (0);
+  }
+  if ((frame.x_9=this, frame.x_9->vptr->Search(frame.x_9, 39))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	if ((frame.x_10 = this, frame.x_10->vptr->Search(frame.x_10, 50))) {
-		System_out_println(1);
+  }else{
+    System_out_println (0);
+  }
+  if ((frame.x_10=this, frame.x_10->vptr->Search(frame.x_10, 50))){
+    System_out_println (1);
 
-	} else {
-		System_out_println(0);
-	}
-	return 999;
+  }else{
+    System_out_println (0);
+  }
+  prev=frame.prev;
+  return 999;
 }
 
-struct BS_Search_gc_frame {
-	void *prev;
-	char *arguments_gc_map;
-	int *arguments_base_address;
-	int locals_gc_map;
-	struct BS * x_11;
-	struct BS * x_12;
-	struct BS * x_13;
+struct BS_Search_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
+  struct BS * x_11;
+  struct BS * x_12;
+  struct BS * x_13;
 };
-char *BS_Search_arguments_gc_map = "10";
-char *BS_Search_locals_gc_map = "0000000111";
+char *BS_Search_arguments_gc_map="10";
+char *BS_Search_locals_gc_map="0000000111";
 void *prev;
-int BS_Search(struct BS * this, int num) {
-	struct BS_Search_gc_frame frame;
+int BS_Search(struct BS * this, int num)
+{
+  struct BS_Search_gc_frame frame;
 
-	frame.prev = prev;
-	prev = &frame;
-	frame.arguments_gc_map = BS_Search_arguments_gc_map;
-	frame.arguments_base_address = (int*) &this;
-	frame.locals_gc_map = 3;
+  memset(&frame,0,sizeof(frame));
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = BS_Search_arguments_gc_map;
+  frame.arguments_base_address =&this;
+  frame.locals_gc_map = 3;
 
-	int bs01;
-	int right;
-	int left;
-	int var_cont;
-	int medium;
-	int aux01;
-	int nt;
+  int bs01;
+  int right;
+  int left;
+  int var_cont;
+  int medium;
+  int aux01;
+  int nt;
 
-	aux01 = 0;
-	bs01 = 0;
-	right = Length(this->number);
-	right = right - 1;
-	left = 0;
-	var_cont = 1;
-	while (var_cont) {
-		medium = left + right;
-		medium = (frame.x_11 = this, frame.x_11->vptr->Div(frame.x_11, medium));
-		aux01 = this->number[medium];
-		if (num < aux01) {
-			right = medium - 1;
+  aux01 = 0;
+  bs01 = 0;
+  right = Length(this->number);
+  right = right - 1;
+  left = 0;
+  var_cont = 1;
+  while (var_cont)
+  {
+    medium = left+right;
+    medium = (frame.x_11=this, frame.x_11->vptr->Div(frame.x_11, medium));
+    aux01 = this->number[medium];
+    if (num < aux01){
+      right = medium - 1;
 
-		} else {
-			left = medium + 1;
-		}
-		if ((frame.x_12 = this, frame.x_12->vptr->Compare(frame.x_12, aux01,
-				num))) {
-			var_cont = 0;
+    }else{
+      left = medium+1;
+    }
+    if ((frame.x_12=this, frame.x_12->vptr->Compare(frame.x_12, aux01, num))){
+      var_cont = 0;
 
-		} else {
-			var_cont = 1;
-		}
-		if (right < left) {
-			var_cont = 0;
+    }else{
+      var_cont = 1;
+    }
+    if (right < left){
+      var_cont = 0;
 
-		} else {
-			nt = 0;
-		}
-	}
-	if ((frame.x_13 = this, frame.x_13->vptr->Compare(frame.x_13, aux01, num))) {
-		bs01 = 1;
+    }else{
+      nt = 0;
+    }
+  }
+  if ((frame.x_13=this, frame.x_13->vptr->Compare(frame.x_13, aux01, num))){
+    bs01 = 1;
 
-	} else {
-		bs01 = 0;
-	}
-	return bs01;
+  }else{
+    bs01 = 0;
+  }
+  prev=frame.prev;
+  return bs01;
 }
 
-struct BS_Div_gc_frame {
-	void *prev;
-	char *arguments_gc_map;
-	int *arguments_base_address;
-	int locals_gc_map;
+struct BS_Div_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
 };
-char *BS_Div_arguments_gc_map = "10";
-char *BS_Div_locals_gc_map = "000";
+char *BS_Div_arguments_gc_map="10";
+char *BS_Div_locals_gc_map="000";
 void *prev;
-int BS_Div(struct BS * this, int num) {
-	struct BS_Div_gc_frame frame;
+int BS_Div(struct BS * this, int num)
+{
+  struct BS_Div_gc_frame frame;
 
-	frame.prev = prev;
-	prev = &frame;
-	frame.arguments_gc_map = BS_Div_arguments_gc_map;
-	frame.arguments_base_address = (int*) &this;
-	frame.locals_gc_map = 0;
+  memset(&frame,0,sizeof(frame));
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = BS_Div_arguments_gc_map;
+  frame.arguments_base_address =&this;
+  frame.locals_gc_map = 0;
 
-	int count01;
-	int count02;
-	int aux03;
+  int count01;
+  int count02;
+  int aux03;
 
-	count01 = 0;
-	count02 = 0;
-	aux03 = num - 1;
-	while (count02 < aux03) {
-		count01 = count01 + 1;
-		count02 = count02 + 2;
-	}
-	return count01;
+  count01 = 0;
+  count02 = 0;
+  aux03 = num - 1;
+  while (count02 < aux03)
+  {
+    count01 = count01+1;
+    count02 = count02+2;
+  }
+  prev=frame.prev;
+  return count01;
 }
 
-struct BS_Compare_gc_frame {
-	void *prev;
-	char *arguments_gc_map;
-	int *arguments_base_address;
-	int locals_gc_map;
+struct BS_Compare_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
 };
-char *BS_Compare_arguments_gc_map = "100";
-char *BS_Compare_locals_gc_map = "00";
+char *BS_Compare_arguments_gc_map="100";
+char *BS_Compare_locals_gc_map="00";
 void *prev;
-int BS_Compare(struct BS * this, int num1, int num2) {
-	struct BS_Compare_gc_frame frame;
+int BS_Compare(struct BS * this, int num1, int num2)
+{
+  struct BS_Compare_gc_frame frame;
 
-	frame.prev = prev;
-	prev = &frame;
-	frame.arguments_gc_map = BS_Compare_arguments_gc_map;
-	frame.arguments_base_address = (int*) &this;
-	frame.locals_gc_map = 0;
+  memset(&frame,0,sizeof(frame));
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = BS_Compare_arguments_gc_map;
+  frame.arguments_base_address =&this;
+  frame.locals_gc_map = 0;
 
-	int retval;
-	int aux02;
+  int retval;
+  int aux02;
 
-	retval = 0;
-	aux02 = num2 + 1;
-	if (num1 < num2) {
-		retval = 0;
+  retval = 0;
+  aux02 = num2+1;
+  if (num1 < num2){
+    retval = 0;
 
-	} else {
-		if (!(num1 < aux02)) {
-			retval = 0;
+  }else{
+    if (!(num1 < aux02)){
+      retval = 0;
 
-		} else {
-			retval = 1;
-		}
-	}
-	return retval;
+    }else{
+      retval = 1;
+    }
+  }
+  prev=frame.prev;
+  return retval;
 }
 
-struct BS_Print_gc_frame {
-	void *prev;
-	char *arguments_gc_map;
-	int *arguments_base_address;
-	int locals_gc_map;
+struct BS_Print_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
 };
-char *BS_Print_arguments_gc_map = "1";
-char *BS_Print_locals_gc_map = "0";
+char *BS_Print_arguments_gc_map="1";
+char *BS_Print_locals_gc_map="0";
 void *prev;
-int BS_Print(struct BS * this) {
-	struct BS_Print_gc_frame frame;
+int BS_Print(struct BS * this)
+{
+  struct BS_Print_gc_frame frame;
 
-	frame.prev = prev;
-	prev = &frame;
-	frame.arguments_gc_map = BS_Print_arguments_gc_map;
-	frame.arguments_base_address = (int*) &this;
-	frame.locals_gc_map = 0;
+  memset(&frame,0,sizeof(frame));
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = BS_Print_arguments_gc_map;
+  frame.arguments_base_address =&this;
+  frame.locals_gc_map = 0;
 
-	int j;
+  int j;
 
-	j = 1;
-	while (j < this->size) {
-		System_out_println(this->number[j]);
-		j = j + 1;
-	}
-	System_out_println(99999);
-	return 0;
+  j = 1;
+  while (j < this->size)
+  {
+    System_out_println (this->number[j]);
+    j = j+1;
+  }
+  System_out_println (99999);
+  prev=frame.prev;
+  return 0;
 }
 
-struct BS_Init_gc_frame {
-	void *prev;
-	char *arguments_gc_map;
-	int *arguments_base_address;
-	int locals_gc_map;
+struct BS_Init_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
 };
-char *BS_Init_arguments_gc_map = "10";
-char *BS_Init_locals_gc_map = "0000";
+char *BS_Init_arguments_gc_map="10";
+char *BS_Init_locals_gc_map="0000";
 void *prev;
-int BS_Init(struct BS * this, int sz) {
-	struct BS_Init_gc_frame frame;
+int BS_Init(struct BS * this, int sz)
+{
+  struct BS_Init_gc_frame frame;
 
-	frame.prev = prev;
-	prev = &frame;
-	frame.arguments_gc_map = BS_Init_arguments_gc_map;
-	frame.arguments_base_address = (int*) &this;
-	frame.locals_gc_map = 0;
+  memset(&frame,0,sizeof(frame));
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = BS_Init_arguments_gc_map;
+  frame.arguments_base_address =&this;
+  frame.locals_gc_map = 0;
 
-	int j;
-	int k;
-	int aux02;
-	int aux01;
+  int j;
+  int k;
+  int aux02;
+  int aux01;
 
-	this->size = sz;
-	this->number = (int*) Tiger_new_array(sz);
-	j = 1;
-	k = this->size + 1;
-	while (j < this->size) {
-		aux01 = 2 * j;
-		aux02 = k - 3;
-		this->number[j] = aux01 + aux02;
-		j = j + 1;
-		k = k - 1;
-	}
-	return 0;
+  this->size = sz;
+  this->number = (int *)Tiger_new_array(sz);
+  j = 1;
+  k = this->size+1;
+  while (j < this->size)
+  {
+    aux01 = 2 * j;
+    aux02 = k - 3;
+    this->number[j] = aux01+aux02;
+    j = j+1;
+    k = k - 1;
+  }
+  prev=frame.prev;
+  return 0;
 }
+
 
 // vtables
-struct BinarySearch_vtable BinarySearch_vtable_ = {
-NULL, };
+struct BinarySearch_vtable BinarySearch_vtable_ = 
+{
+  "",
+};
 
-struct BS_vtable BS_vtable_ = { "10", BS_Start, BS_Search, BS_Div, BS_Compare,
-		BS_Print, BS_Init, };
+struct BS_vtable BS_vtable_ = 
+{
+  "10",
+  BS_Start,
+  BS_Search,
+  BS_Div,
+  BS_Compare,
+  BS_Print,
+  BS_Init,
+};
+
 
 // main method
-struct main_gc_frame {
-	void *prev;
-	char *arguments_gc_map;
-	int *arguments_base_address;
-	int locals_gc_map;
-	struct BS * x_0;
+struct main_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
+  struct BS * x_0;
 };
 void *prev;
-int Tiger_main() {
-	struct main_gc_frame frame;
+int Tiger_main ()
+{
+  struct  main_gc_frame frame;
 
-	frame.prev = prev;
-	prev = &frame;
-	frame.arguments_gc_map = NULL;
-	frame.arguments_base_address = 0;
-	frame.locals_gc_map = 1;
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = NULL;
+  frame.arguments_base_address = 0;
+  frame.locals_gc_map = 1;
 
-	System_out_println(
-			(frame.x_0 = ((struct BS*) (Tiger_new(&BS_vtable_,
-					sizeof(struct BS)))), frame.x_0->vptr->Start(frame.x_0, 20)));
+  System_out_println ((frame.x_0=((struct BS*)(Tiger_new (&BS_vtable_, sizeof(struct BS)))), frame.x_0->vptr->Start(frame.x_0, 20)));
+
+  prev=frame.prev;
 }
+
+
+
 

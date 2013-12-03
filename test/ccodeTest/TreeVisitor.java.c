@@ -3,18 +3,28 @@
 
 #define NULL ((void*)0)
 
+#include <string.h>
 // structures
 struct TreeVisitor
 {
   struct TreeVisitor_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 struct TV
 {
   struct TV_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 struct Tree
 {
   struct Tree_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   struct Tree * left;
   struct Tree * right;
   int key;
@@ -25,12 +35,18 @@ struct Tree
 struct Visitor
 {
   struct Visitor_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   struct Tree * l;
   struct Tree * r;
 };
 struct MyVisitor
 {
   struct MyVisitor_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   struct Tree * l;
   struct Tree * r;
 };
@@ -97,7 +113,7 @@ struct MyVisitor_vtable MyVisitor_vtable_ ;
 struct TV_Start_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * root;
   struct MyVisitor * v;
@@ -127,11 +143,14 @@ void *prev;
 int TV_Start(struct TV * this)
 {
   struct TV_Start_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = TV_Start_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 21;
+
   int ntb;
   int nti;
 
@@ -160,13 +179,14 @@ int TV_Start(struct TV * this)
   ntb = (frame.x_17=frame.root, frame.x_17->vptr->Delete(frame.x_17, 12));
   ntb = (frame.x_18=frame.root, frame.x_18->vptr->Print(frame.x_18));
   System_out_println ((frame.x_19=frame.root, frame.x_19->vptr->Search(frame.x_19, 12)));
+  prev=frame.prev;
   return 0;
 }
 
 struct Tree_Init_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_Init_arguments_gc_map="10";
@@ -175,22 +195,26 @@ void *prev;
 int Tree_Init(struct Tree * this, int v_key)
 {
   struct Tree_Init_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_Init_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
 
   this->key = v_key;
   this->has_left = 0;
   this->has_right = 0;
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_SetRight_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_SetRight_arguments_gc_map="11";
@@ -199,20 +223,24 @@ void *prev;
 int Tree_SetRight(struct Tree * this, struct Tree * rn)
 {
   struct Tree_SetRight_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_SetRight_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->right = rn;
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_SetLeft_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_SetLeft_arguments_gc_map="11";
@@ -221,20 +249,24 @@ void *prev;
 int Tree_SetLeft(struct Tree * this, struct Tree * ln)
 {
   struct Tree_SetLeft_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_SetLeft_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->left = ln;
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_GetRight_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_GetRight_arguments_gc_map="1";
@@ -243,19 +275,23 @@ void *prev;
 struct Tree * Tree_GetRight(struct Tree * this)
 {
   struct Tree_GetRight_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_GetRight_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->right;
 }
 
 struct Tree_GetLeft_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_GetLeft_arguments_gc_map="1";
@@ -264,19 +300,23 @@ void *prev;
 struct Tree * Tree_GetLeft(struct Tree * this)
 {
   struct Tree_GetLeft_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_GetLeft_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->left;
 }
 
 struct Tree_GetKey_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_GetKey_arguments_gc_map="1";
@@ -285,19 +325,23 @@ void *prev;
 int Tree_GetKey(struct Tree * this)
 {
   struct Tree_GetKey_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_GetKey_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->key;
 }
 
 struct Tree_SetKey_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_SetKey_arguments_gc_map="10";
@@ -306,20 +350,24 @@ void *prev;
 int Tree_SetKey(struct Tree * this, int v_key)
 {
   struct Tree_SetKey_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_SetKey_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->key = v_key;
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_GetHas_Right_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_GetHas_Right_arguments_gc_map="1";
@@ -328,19 +376,23 @@ void *prev;
 int Tree_GetHas_Right(struct Tree * this)
 {
   struct Tree_GetHas_Right_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_GetHas_Right_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->has_right;
 }
 
 struct Tree_GetHas_Left_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_GetHas_Left_arguments_gc_map="1";
@@ -349,19 +401,23 @@ void *prev;
 int Tree_GetHas_Left(struct Tree * this)
 {
   struct Tree_GetHas_Left_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_GetHas_Left_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->has_left;
 }
 
 struct Tree_SetHas_Left_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_SetHas_Left_arguments_gc_map="10";
@@ -370,20 +426,24 @@ void *prev;
 int Tree_SetHas_Left(struct Tree * this, int val)
 {
   struct Tree_SetHas_Left_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_SetHas_Left_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->has_left = val;
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_SetHas_Right_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_SetHas_Right_arguments_gc_map="10";
@@ -392,20 +452,24 @@ void *prev;
 int Tree_SetHas_Right(struct Tree * this, int val)
 {
   struct Tree_SetHas_Right_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_SetHas_Right_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->has_right = val;
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_Compare_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Tree_Compare_arguments_gc_map="100";
@@ -414,11 +478,14 @@ void *prev;
 int Tree_Compare(struct Tree * this, int num1, int num2)
 {
   struct Tree_Compare_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_Compare_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int ntb;
   int nti;
 
@@ -435,13 +502,14 @@ int Tree_Compare(struct Tree * this, int num1, int num2)
       ntb = 1;
     }
   }
+  prev=frame.prev;
   return ntb;
 }
 
 struct Tree_Insert_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * new_node;
   struct Tree * current_node;
@@ -462,11 +530,14 @@ void *prev;
 int Tree_Insert(struct Tree * this, int v_key)
 {
   struct Tree_Insert_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_Insert_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 12;
+
   int ntb;
   int cont;
   int key_aux;
@@ -499,13 +570,14 @@ int Tree_Insert(struct Tree * this, int v_key)
       }
     }
   }
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_Delete_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * current_node;
   struct Tree * parent_node;
@@ -525,11 +597,14 @@ void *prev;
 int Tree_Delete(struct Tree * this, int v_key)
 {
   struct Tree_Delete_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_Delete_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 11;
+
   int cont;
   int found;
   int ntb;
@@ -581,13 +656,14 @@ int Tree_Delete(struct Tree * this, int v_key)
     }
     is_root = 0;
   }
+  prev=frame.prev;
   return found;
 }
 
 struct Tree_Remove_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * x_39;
   struct Tree * x_40;
@@ -608,11 +684,14 @@ void *prev;
 int Tree_Remove(struct Tree * this, struct Tree * p_node, struct Tree * c_node)
 {
   struct Tree_Remove_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_Remove_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 12;
+
   int ntb;
   int auxkey1;
   int auxkey2;
@@ -637,13 +716,14 @@ int Tree_Remove(struct Tree * this, struct Tree * p_node, struct Tree * c_node)
       }
     }
   }
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_RemoveRight_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * x_51;
   struct Tree * x_52;
@@ -659,11 +739,14 @@ void *prev;
 int Tree_RemoveRight(struct Tree * this, struct Tree * p_node, struct Tree * c_node)
 {
   struct Tree_RemoveRight_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_RemoveRight_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 7;
+
   int ntb;
 
   while ((frame.x_51=c_node, frame.x_51->vptr->GetHas_Right(frame.x_51)))
@@ -674,13 +757,14 @@ int Tree_RemoveRight(struct Tree * this, struct Tree * p_node, struct Tree * c_n
   }
   ntb = (frame.x_56=p_node, frame.x_56->vptr->SetRight(frame.x_56, this->my_null));
   ntb = (frame.x_57=p_node, frame.x_57->vptr->SetHas_Right(frame.x_57, 0));
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_RemoveLeft_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * x_58;
   struct Tree * x_59;
@@ -696,11 +780,14 @@ void *prev;
 int Tree_RemoveLeft(struct Tree * this, struct Tree * p_node, struct Tree * c_node)
 {
   struct Tree_RemoveLeft_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_RemoveLeft_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 7;
+
   int ntb;
 
   while ((frame.x_58=c_node, frame.x_58->vptr->GetHas_Left(frame.x_58)))
@@ -711,13 +798,14 @@ int Tree_RemoveLeft(struct Tree * this, struct Tree * p_node, struct Tree * c_no
   }
   ntb = (frame.x_63=p_node, frame.x_63->vptr->SetLeft(frame.x_63, this->my_null));
   ntb = (frame.x_64=p_node, frame.x_64->vptr->SetHas_Left(frame.x_64, 0));
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_Search_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * current_node;
   struct Tree * x_65;
@@ -732,11 +820,14 @@ void *prev;
 int Tree_Search(struct Tree * this, int v_key)
 {
   struct Tree_Search_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_Search_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 6;
+
   int ifound;
   int cont;
   int key_aux;
@@ -770,13 +861,14 @@ int Tree_Search(struct Tree * this, int v_key)
       }
     }
   }
+  prev=frame.prev;
   return ifound;
 }
 
 struct Tree_Print_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * current_node;
   struct Tree * x_70;
@@ -787,22 +879,26 @@ void *prev;
 int Tree_Print(struct Tree * this)
 {
   struct Tree_Print_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_Print_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 2;
+
   int ntb;
 
   frame.current_node = this;
   ntb = (frame.x_70=this, frame.x_70->vptr->RecPrint(frame.x_70, frame.current_node));
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_RecPrint_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * x_71;
   struct Tree * x_72;
@@ -818,11 +914,14 @@ void *prev;
 int Tree_RecPrint(struct Tree * this, struct Tree * node)
 {
   struct Tree_RecPrint_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_RecPrint_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 7;
+
   int ntb;
 
   if ((frame.x_71=node, frame.x_71->vptr->GetHas_Left(frame.x_71))){
@@ -838,13 +937,14 @@ int Tree_RecPrint(struct Tree * this, struct Tree * node)
   }else{
     ntb = 1;
   }
+  prev=frame.prev;
   return 1;
 }
 
 struct Tree_accept_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Visitor * x_78;
 };
@@ -854,22 +954,26 @@ void *prev;
 int Tree_accept(struct Tree * this, struct Visitor * v)
 {
   struct Tree_accept_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Tree_accept_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 1;
+
   int nti;
 
   System_out_println (333);
   nti = (frame.x_78=v, frame.x_78->vptr->visit(frame.x_78, this));
+  prev=frame.prev;
   return 0;
 }
 
 struct Visitor_visit_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * x_79;
   struct Tree * x_80;
@@ -884,11 +988,14 @@ void *prev;
 int Visitor_visit(struct Visitor * this, struct Tree * n)
 {
   struct Visitor_visit_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Visitor_visit_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 6;
+
   int nti;
 
   if ((frame.x_79=n, frame.x_79->vptr->GetHas_Right(frame.x_79))){
@@ -905,13 +1012,14 @@ int Visitor_visit(struct Visitor * this, struct Tree * n)
   }else{
     nti = 0;
   }
+  prev=frame.prev;
   return 0;
 }
 
 struct MyVisitor_visit_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Tree * x_85;
   struct Tree * x_86;
@@ -927,11 +1035,14 @@ void *prev;
 int MyVisitor_visit(struct MyVisitor * this, struct Tree * n)
 {
   struct MyVisitor_visit_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = MyVisitor_visit_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 7;
+
   int nti;
 
   if ((frame.x_85=n, frame.x_85->vptr->GetHas_Right(frame.x_85))){
@@ -949,6 +1060,7 @@ int MyVisitor_visit(struct MyVisitor * this, struct Tree * n)
   }else{
     nti = 0;
   }
+  prev=frame.prev;
   return 0;
 }
 
@@ -956,12 +1068,12 @@ int MyVisitor_visit(struct MyVisitor * this, struct Tree * n)
 // vtables
 struct TreeVisitor_vtable TreeVisitor_vtable_ = 
 {
-  NULL,
+  "",
 };
 
 struct TV_vtable TV_vtable_ = 
 {
-  NULL,
+  "",
   TV_Start,
 };
 
@@ -1008,7 +1120,7 @@ struct MyVisitor_vtable MyVisitor_vtable_ =
 struct main_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct TV * x_0;
 };
@@ -1016,12 +1128,16 @@ void *prev;
 int Tiger_main ()
 {
   struct  main_gc_frame frame;
+
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = NULL;
   frame.arguments_base_address = 0;
   frame.locals_gc_map = 1;
+
   System_out_println ((frame.x_0=((struct TV*)(Tiger_new (&TV_vtable_, sizeof(struct TV)))), frame.x_0->vptr->Start(frame.x_0)));
+
+  prev=frame.prev;
 }
 
 

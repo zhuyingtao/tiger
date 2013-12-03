@@ -3,14 +3,21 @@
 
 #define NULL ((void*)0)
 
+#include <string.h>
 // structures
 struct LinkedList
 {
   struct LinkedList_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 struct Element
 {
   struct Element_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   int Age;
   int Salary;
   int Married;
@@ -18,6 +25,9 @@ struct Element
 struct List
 {
   struct List_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
   struct Element * elem;
   struct List * next;
   int end;
@@ -25,6 +35,9 @@ struct List
 struct LL
 {
   struct LL_vtable *vptr;
+  int isObjOrArray;
+  int length;
+  void *forwarding;
 };
 
 // vtables structures
@@ -76,7 +89,7 @@ struct LL_vtable LL_vtable_ ;
 struct Element_Init_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Element_Init_arguments_gc_map="1000";
@@ -85,22 +98,26 @@ void *prev;
 int Element_Init(struct Element * this, int v_Age, int v_Salary, int v_Married)
 {
   struct Element_Init_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Element_Init_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
 
   this->Age = v_Age;
   this->Salary = v_Salary;
   this->Married = v_Married;
+  prev=frame.prev;
   return 1;
 }
 
 struct Element_GetAge_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Element_GetAge_arguments_gc_map="1";
@@ -109,19 +126,23 @@ void *prev;
 int Element_GetAge(struct Element * this)
 {
   struct Element_GetAge_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Element_GetAge_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->Age;
 }
 
 struct Element_GetSalary_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Element_GetSalary_arguments_gc_map="1";
@@ -130,19 +151,23 @@ void *prev;
 int Element_GetSalary(struct Element * this)
 {
   struct Element_GetSalary_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Element_GetSalary_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->Salary;
 }
 
 struct Element_GetMarried_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Element_GetMarried_arguments_gc_map="1";
@@ -151,19 +176,23 @@ void *prev;
 int Element_GetMarried(struct Element * this)
 {
   struct Element_GetMarried_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Element_GetMarried_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->Married;
 }
 
 struct Element_Equal_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct Element * x_1;
   struct Element * x_2;
@@ -178,41 +207,32 @@ void *prev;
 int Element_Equal(struct Element * this, struct Element * other)
 {
   struct Element_Equal_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Element_Equal_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 6;
+
   int ret_val;
   int aux01;
   int aux02;
   int nt;
-  struct Element * x_1;
-  frame.x_1 = x_1;
-  struct Element * x_2;
-  frame.x_2 = x_2;
-  struct Element * x_3;
-  frame.x_3 = x_3;
-  struct Element * x_4;
-  frame.x_4 = x_4;
-  struct Element * x_5;
-  frame.x_5 = x_5;
-  struct Element * x_6;
-  frame.x_6 = x_6;
 
   ret_val = 1;
-  aux01 = (x_1=other, x_1->vptr->GetAge(x_1));
-  if (!((x_2=this, x_2->vptr->Compare(x_2, aux01, this->Age)))){
+  aux01 = (frame.x_1=other, frame.x_1->vptr->GetAge(frame.x_1));
+  if (!((frame.x_2=this, frame.x_2->vptr->Compare(frame.x_2, aux01, this->Age)))){
     ret_val = 0;
 
   }else{
-    aux02 = (x_3=other, x_3->vptr->GetSalary(x_3));
-    if (!((x_4=this, x_4->vptr->Compare(x_4, aux02, this->Salary)))){
+    aux02 = (frame.x_3=other, frame.x_3->vptr->GetSalary(frame.x_3));
+    if (!((frame.x_4=this, frame.x_4->vptr->Compare(frame.x_4, aux02, this->Salary)))){
       ret_val = 0;
 
     }else{
       if (this->Married){
-        if (!((x_5=other, x_5->vptr->GetMarried(x_5)))){
+        if (!((frame.x_5=other, frame.x_5->vptr->GetMarried(frame.x_5)))){
           ret_val = 0;
 
         }else{
@@ -220,7 +240,7 @@ int Element_Equal(struct Element * this, struct Element * other)
         }
 
       }else{
-        if ((x_6=other, x_6->vptr->GetMarried(x_6))){
+        if ((frame.x_6=other, frame.x_6->vptr->GetMarried(frame.x_6))){
           ret_val = 0;
 
         }else{
@@ -229,13 +249,14 @@ int Element_Equal(struct Element * this, struct Element * other)
       }
     }
   }
+  prev=frame.prev;
   return ret_val;
 }
 
 struct Element_Compare_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *Element_Compare_arguments_gc_map="100";
@@ -244,11 +265,14 @@ void *prev;
 int Element_Compare(struct Element * this, int num1, int num2)
 {
   struct Element_Compare_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = Element_Compare_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
   int retval;
   int aux02;
 
@@ -265,13 +289,14 @@ int Element_Compare(struct Element * this, int num1, int num2)
       retval = 1;
     }
   }
+  prev=frame.prev;
   return retval;
 }
 
 struct List_Init_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *List_Init_arguments_gc_map="1";
@@ -280,20 +305,24 @@ void *prev;
 int List_Init(struct List * this)
 {
   struct List_Init_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_Init_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->end = 1;
+  prev=frame.prev;
   return 1;
 }
 
 struct List_InitNew_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *List_InitNew_arguments_gc_map="1110";
@@ -302,22 +331,26 @@ void *prev;
 int List_InitNew(struct List * this, struct Element * v_elem, struct List * v_next, int v_end)
 {
   struct List_InitNew_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_InitNew_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
+
 
   this->end = v_end;
   this->elem = v_elem;
   this->next = v_next;
+  prev=frame.prev;
   return 1;
 }
 
 struct List_Insert_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct List * aux03;
   struct List * aux02;
@@ -329,29 +362,27 @@ void *prev;
 struct List * List_Insert(struct List * this, struct Element * new_elem)
 {
   struct List_Insert_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_Insert_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 3;
-  int ret_val;
-  struct List * aux03;
-  frame.aux03 = aux03;
-  struct List * aux02;
-  frame.aux02 = aux02;
-  struct List * x_7;
-  frame.x_7 = x_7;
 
-  aux03 = this;
-  aux02 = ((struct List*)(Tiger_new (&List_vtable_, sizeof(struct List))));
-  ret_val = (x_7=aux02, x_7->vptr->InitNew(x_7, new_elem, aux03, 0));
-  return aux02;
+  int ret_val;
+
+  frame.aux03 = this;
+  frame.aux02 = ((struct List*)(Tiger_new (&List_vtable_, sizeof(struct List))));
+  ret_val = (frame.x_7=frame.aux02, frame.x_7->vptr->InitNew(frame.x_7, new_elem, frame.aux03, 0));
+  prev=frame.prev;
+  return frame.aux02;
 }
 
 struct List_SetNext_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *List_SetNext_arguments_gc_map="11";
@@ -360,20 +391,24 @@ void *prev;
 int List_SetNext(struct List * this, struct List * v_next)
 {
   struct List_SetNext_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_SetNext_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
   this->next = v_next;
+  prev=frame.prev;
   return 1;
 }
 
 struct List_Delete_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct List * my_head;
   struct List * aux01;
@@ -393,56 +428,37 @@ void *prev;
 struct List * List_Delete(struct List * this, struct Element * e)
 {
   struct List_Delete_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_Delete_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 11;
-  struct List * my_head;
-  frame.my_head = my_head;
+
   int ret_val;
   int aux05;
-  struct List * aux01;
-  frame.aux01 = aux01;
-  struct List * prev01;
-  frame.prev01 = prev01;
   int var_end;
-  struct Element * var_elem;
-  frame.var_elem = var_elem;
   int aux04;
   int nt;
-  struct Element * x_8;
-  frame.x_8 = x_8;
-  struct List * x_9;
-  frame.x_9 = x_9;
-  struct List * x_10;
-  frame.x_10 = x_10;
-  struct List * x_11;
-  frame.x_11 = x_11;
-  struct List * x_12;
-  frame.x_12 = x_12;
-  struct List * x_13;
-  frame.x_13 = x_13;
-  struct List * x_14;
-  frame.x_14 = x_14;
 
-  my_head = this;
+  frame.my_head = this;
   ret_val = 0;
   aux04 = 0 - 1;
-  aux01 = this;
-  prev01 = this;
+  frame.aux01 = this;
+  frame.prev01 = this;
   var_end = this->end;
-  var_elem = this->elem;
+  frame.var_elem = this->elem;
   while (!(var_end)&&!(ret_val))
   {
-    if ((x_8=e, x_8->vptr->Equal(x_8, var_elem))){
+    if ((frame.x_8=e, frame.x_8->vptr->Equal(frame.x_8, frame.var_elem))){
       ret_val = 1;
       if (aux04 < 0){
-        my_head = (x_9=aux01, x_9->vptr->GetNext(x_9));
+        frame.my_head = (frame.x_9=frame.aux01, frame.x_9->vptr->GetNext(frame.x_9));
 
       }else{
         System_out_println (0 - 555);
-        aux05 = (x_10=prev01, x_10->vptr->SetNext(x_10, (x_11=aux01, x_11->vptr->GetNext(x_11))));
+        aux05 = (frame.x_10=frame.prev01, frame.x_10->vptr->SetNext(frame.x_10, (frame.x_11=frame.aux01, frame.x_11->vptr->GetNext(frame.x_11))));
         System_out_println (0 - 555);
       }
 
@@ -450,23 +466,24 @@ struct List * List_Delete(struct List * this, struct Element * e)
       nt = 0;
     }
     if (!(ret_val)){
-      prev01 = aux01;
-      aux01 = (x_12=aux01, x_12->vptr->GetNext(x_12));
-      var_end = (x_13=aux01, x_13->vptr->GetEnd(x_13));
-      var_elem = (x_14=aux01, x_14->vptr->GetElem(x_14));
+      frame.prev01 = frame.aux01;
+      frame.aux01 = (frame.x_12=frame.aux01, frame.x_12->vptr->GetNext(frame.x_12));
+      var_end = (frame.x_13=frame.aux01, frame.x_13->vptr->GetEnd(frame.x_13));
+      frame.var_elem = (frame.x_14=frame.aux01, frame.x_14->vptr->GetElem(frame.x_14));
       aux04 = 1;
 
     }else{
       nt = 0;
     }
   }
-  return my_head;
+  prev=frame.prev;
+  return frame.my_head;
 }
 
 struct List_Search_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct List * aux01;
   struct Element * var_elem;
@@ -481,50 +498,42 @@ void *prev;
 int List_Search(struct List * this, struct Element * e)
 {
   struct List_Search_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_Search_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 6;
+
   int int_ret_val;
-  struct List * aux01;
-  frame.aux01 = aux01;
-  struct Element * var_elem;
-  frame.var_elem = var_elem;
   int var_end;
   int nt;
-  struct Element * x_15;
-  frame.x_15 = x_15;
-  struct List * x_16;
-  frame.x_16 = x_16;
-  struct List * x_17;
-  frame.x_17 = x_17;
-  struct List * x_18;
-  frame.x_18 = x_18;
 
   int_ret_val = 0;
-  aux01 = this;
+  frame.aux01 = this;
   var_end = this->end;
-  var_elem = this->elem;
+  frame.var_elem = this->elem;
   while (!(var_end))
   {
-    if ((x_15=e, x_15->vptr->Equal(x_15, var_elem))){
+    if ((frame.x_15=e, frame.x_15->vptr->Equal(frame.x_15, frame.var_elem))){
       int_ret_val = 1;
 
     }else{
       nt = 0;
     }
-    aux01 = (x_16=aux01, x_16->vptr->GetNext(x_16));
-    var_end = (x_17=aux01, x_17->vptr->GetEnd(x_17));
-    var_elem = (x_18=aux01, x_18->vptr->GetElem(x_18));
+    frame.aux01 = (frame.x_16=frame.aux01, frame.x_16->vptr->GetNext(frame.x_16));
+    var_end = (frame.x_17=frame.aux01, frame.x_17->vptr->GetEnd(frame.x_17));
+    frame.var_elem = (frame.x_18=frame.aux01, frame.x_18->vptr->GetElem(frame.x_18));
   }
+  prev=frame.prev;
   return int_ret_val;
 }
 
 struct List_GetEnd_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *List_GetEnd_arguments_gc_map="1";
@@ -533,19 +542,23 @@ void *prev;
 int List_GetEnd(struct List * this)
 {
   struct List_GetEnd_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_GetEnd_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->end;
 }
 
 struct List_GetElem_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *List_GetElem_arguments_gc_map="1";
@@ -554,19 +567,23 @@ void *prev;
 struct Element * List_GetElem(struct List * this)
 {
   struct List_GetElem_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_GetElem_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->elem;
 }
 
 struct List_GetNext_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
 };
 char *List_GetNext_arguments_gc_map="1";
@@ -575,19 +592,23 @@ void *prev;
 struct List * List_GetNext(struct List * this)
 {
   struct List_GetNext_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_GetNext_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 0;
 
+
+  prev=frame.prev;
   return this->next;
 }
 
 struct List_Print_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct List * aux01;
   struct Element * var_elem;
@@ -602,42 +623,34 @@ void *prev;
 int List_Print(struct List * this)
 {
   struct List_Print_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = List_Print_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 6;
-  struct List * aux01;
-  frame.aux01 = aux01;
-  int var_end;
-  struct Element * var_elem;
-  frame.var_elem = var_elem;
-  struct Element * x_19;
-  frame.x_19 = x_19;
-  struct List * x_20;
-  frame.x_20 = x_20;
-  struct List * x_21;
-  frame.x_21 = x_21;
-  struct List * x_22;
-  frame.x_22 = x_22;
 
-  aux01 = this;
+  int var_end;
+
+  frame.aux01 = this;
   var_end = this->end;
-  var_elem = this->elem;
+  frame.var_elem = this->elem;
   while (!(var_end))
   {
-    System_out_println ((x_19=var_elem, x_19->vptr->GetAge(x_19)));
-    aux01 = (x_20=aux01, x_20->vptr->GetNext(x_20));
-    var_end = (x_21=aux01, x_21->vptr->GetEnd(x_21));
-    var_elem = (x_22=aux01, x_22->vptr->GetElem(x_22));
+    System_out_println ((frame.x_19=frame.var_elem, frame.x_19->vptr->GetAge(frame.x_19)));
+    frame.aux01 = (frame.x_20=frame.aux01, frame.x_20->vptr->GetNext(frame.x_20));
+    var_end = (frame.x_21=frame.aux01, frame.x_21->vptr->GetEnd(frame.x_21));
+    frame.var_elem = (frame.x_22=frame.aux01, frame.x_22->vptr->GetElem(frame.x_22));
   }
+  prev=frame.prev;
   return 1;
 }
 
 struct LL_Start_gc_frame{
   void *prev;
   char *arguments_gc_map;
-  int *arguments_base_address;
+  void *arguments_base_address;
   int locals_gc_map;
   struct List * head;
   struct List * last_elem;
@@ -673,103 +686,53 @@ void *prev;
 int LL_Start(struct LL * this)
 {
   struct LL_Start_gc_frame frame;
+
+  memset(&frame,0,sizeof(frame));
   frame.prev = prev;
   prev = &frame;
   frame.arguments_gc_map = LL_Start_arguments_gc_map;
-  frame.arguments_base_address =(int*) &this;
+  frame.arguments_base_address =&this;
   frame.locals_gc_map = 27;
-  struct List * head;
-  frame.head = head;
-  struct List * last_elem;
-  frame.last_elem = last_elem;
-  int aux01;
-  struct Element * el01;
-  frame.el01 = el01;
-  struct Element * el02;
-  frame.el02 = el02;
-  struct Element * el03;
-  frame.el03 = el03;
-  struct List * x_23;
-  frame.x_23 = x_23;
-  struct List * x_24;
-  frame.x_24 = x_24;
-  struct List * x_25;
-  frame.x_25 = x_25;
-  struct Element * x_26;
-  frame.x_26 = x_26;
-  struct List * x_27;
-  frame.x_27 = x_27;
-  struct List * x_28;
-  frame.x_28 = x_28;
-  struct Element * x_29;
-  frame.x_29 = x_29;
-  struct List * x_30;
-  frame.x_30 = x_30;
-  struct List * x_31;
-  frame.x_31 = x_31;
-  struct Element * x_32;
-  frame.x_32 = x_32;
-  struct List * x_33;
-  frame.x_33 = x_33;
-  struct List * x_34;
-  frame.x_34 = x_34;
-  struct Element * x_35;
-  frame.x_35 = x_35;
-  struct List * x_36;
-  frame.x_36 = x_36;
-  struct List * x_37;
-  frame.x_37 = x_37;
-  struct Element * x_38;
-  frame.x_38 = x_38;
-  struct List * x_39;
-  frame.x_39 = x_39;
-  struct List * x_40;
-  frame.x_40 = x_40;
-  struct List * x_41;
-  frame.x_41 = x_41;
-  struct List * x_42;
-  frame.x_42 = x_42;
-  struct List * x_43;
-  frame.x_43 = x_43;
-  struct List * x_44;
-  frame.x_44 = x_44;
 
-  last_elem = ((struct List*)(Tiger_new (&List_vtable_, sizeof(struct List))));
-  aux01 = (x_23=last_elem, x_23->vptr->Init(x_23));
-  head = last_elem;
-  aux01 = (x_24=head, x_24->vptr->Init(x_24));
-  aux01 = (x_25=head, x_25->vptr->Print(x_25));
-  el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
-  aux01 = (x_26=el01, x_26->vptr->Init(x_26, 25, 37000, 0));
-  head = (x_27=head, x_27->vptr->Insert(x_27, el01));
-  aux01 = (x_28=head, x_28->vptr->Print(x_28));
+  int aux01;
+
+  frame.last_elem = ((struct List*)(Tiger_new (&List_vtable_, sizeof(struct List))));
+  aux01 = (frame.x_23=frame.last_elem, frame.x_23->vptr->Init(frame.x_23));
+  frame.head = frame.last_elem;
+  aux01 = (frame.x_24=frame.head, frame.x_24->vptr->Init(frame.x_24));
+  aux01 = (frame.x_25=frame.head, frame.x_25->vptr->Print(frame.x_25));
+  frame.el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
+  aux01 = (frame.x_26=frame.el01, frame.x_26->vptr->Init(frame.x_26, 25, 37000, 0));
+  frame.head = (frame.x_27=frame.head, frame.x_27->vptr->Insert(frame.x_27, frame.el01));
+  aux01 = (frame.x_28=frame.head, frame.x_28->vptr->Print(frame.x_28));
   System_out_println (10000000);
-  el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
-  aux01 = (x_29=el01, x_29->vptr->Init(x_29, 39, 42000, 1));
-  el02 = el01;
-  head = (x_30=head, x_30->vptr->Insert(x_30, el01));
-  aux01 = (x_31=head, x_31->vptr->Print(x_31));
+  frame.el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
+  aux01 = (frame.x_29=frame.el01, frame.x_29->vptr->Init(frame.x_29, 39, 42000, 1));
+  frame.el02 = frame.el01;
+  frame.head = (frame.x_30=frame.head, frame.x_30->vptr->Insert(frame.x_30, frame.el01));
+  aux01 = (frame.x_31=frame.head, frame.x_31->vptr->Print(frame.x_31));
   System_out_println (10000000);
-  el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
-  aux01 = (x_32=el01, x_32->vptr->Init(x_32, 22, 34000, 0));
-  head = (x_33=head, x_33->vptr->Insert(x_33, el01));
-  aux01 = (x_34=head, x_34->vptr->Print(x_34));
-  el03 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
-  aux01 = (x_35=el03, x_35->vptr->Init(x_35, 27, 34000, 0));
-  System_out_println ((x_36=head, x_36->vptr->Search(x_36, el02)));
-  System_out_println ((x_37=head, x_37->vptr->Search(x_37, el03)));
+  frame.el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
+  aux01 = (frame.x_32=frame.el01, frame.x_32->vptr->Init(frame.x_32, 22, 34000, 0));
+  frame.head = (frame.x_33=frame.head, frame.x_33->vptr->Insert(frame.x_33, frame.el01));
+  aux01 = (frame.x_34=frame.head, frame.x_34->vptr->Print(frame.x_34));
+  frame.el03 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
+  aux01 = (frame.x_35=frame.el03, frame.x_35->vptr->Init(frame.x_35, 27, 34000, 0));
+  System_out_println ((frame.x_36=frame.head, frame.x_36->vptr->Search(frame.x_36, frame.el02)));
+  System_out_println ((frame.x_37=frame.head, frame.x_37->vptr->Search(frame.x_37, frame.el03)));
   System_out_println (10000000);
-  el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
-  aux01 = (x_38=el01, x_38->vptr->Init(x_38, 28, 35000, 0));
-  head = (x_39=head, x_39->vptr->Insert(x_39, el01));
-  aux01 = (x_40=head, x_40->vptr->Print(x_40));
+  frame.el01 = ((struct Element*)(Tiger_new (&Element_vtable_, sizeof(struct Element))));
+  aux01 = (frame.x_38=frame.el01, frame.x_38->vptr->Init(frame.x_38, 28, 35000, 0));
+  frame.head = (frame.x_39=frame.head, frame.x_39->vptr->Insert(frame.x_39, frame.el01));
+  aux01 = (frame.x_40=frame.head, frame.x_40->vptr->Print(frame.x_40));
   System_out_println (2220000);
-  head = (x_41=head, x_41->vptr->Delete(x_41, el02));
-  aux01 = (x_42=head, x_42->vptr->Print(x_42));
+  frame.head = (frame.x_41=frame.head, frame.x_41->vptr->Delete(frame.x_41, frame.el02));
+  aux01 = (frame.x_42=frame.head, frame.x_42->vptr->Print(frame.x_42));
   System_out_println (33300000);
-  head = (x_43=head, x_43->vptr->Delete(x_43, el01));
-  aux01 = (x_44=head, x_44->vptr->Print(x_44));
+  frame.head = (frame.x_43=frame.head, frame.x_43->vptr->Delete(frame.x_43, frame.el01));
+  aux01 = (frame.x_44=frame.head, frame.x_44->vptr->Print(frame.x_44));
   System_out_println (44440000);
+  prev=frame.prev;
   return 0;
 }
 
@@ -777,7 +740,7 @@ int LL_Start(struct LL * this)
 // vtables
 struct LinkedList_vtable LinkedList_vtable_ = 
 {
-  NULL,
+  "",
 };
 
 struct Element_vtable Element_vtable_ = 
@@ -808,16 +771,33 @@ struct List_vtable List_vtable_ =
 
 struct LL_vtable LL_vtable_ = 
 {
-  NULL,
+  "",
   LL_Start,
 };
 
 
 // main method
+struct main_gc_frame{
+  void *prev;
+  char *arguments_gc_map;
+  void *arguments_base_address;
+  int locals_gc_map;
+  struct LL * x_0;
+};
+void *prev;
 int Tiger_main ()
 {
-  struct LL * x_0;
-  System_out_println ((x_0=((struct LL*)(Tiger_new (&LL_vtable_, sizeof(struct LL)))), x_0->vptr->Start(x_0)));
+  struct  main_gc_frame frame;
+
+  frame.prev = prev;
+  prev = &frame;
+  frame.arguments_gc_map = NULL;
+  frame.arguments_base_address = 0;
+  frame.locals_gc_map = 1;
+
+  System_out_println ((frame.x_0=((struct LL*)(Tiger_new (&LL_vtable_, sizeof(struct LL)))), frame.x_0->vptr->Start(frame.x_0)));
+
+  prev=frame.prev;
 }
 
 
