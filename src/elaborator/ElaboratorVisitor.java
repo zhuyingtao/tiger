@@ -24,7 +24,6 @@ public class ElaboratorVisitor implements ast.Visitor {
 			System.err.println("the identify ' " + this.errID
 					+ " ' has not been declared!" + " --- at line "
 					+ this.errLine);
-
 			break;
 		case "NotSame":
 			System.err.println("the type of the expression"
@@ -34,22 +33,18 @@ public class ElaboratorVisitor implements ast.Visitor {
 		case "ArrayIndex":
 			System.err.println("the index of array must be the type of int!"
 					+ " --- at line " + this.errLine);
-
 			break;
 		case "IntArray":
 			System.err.println("the type of the array must be int[]!"
 					+ " --- at line " + this.errLine);
-
 			break;
 		case "NotClass":
 			System.err.println("the method must be called by a class!"
 					+ " --- at line " + this.errLine);
-
 			break;
 		case "Parameters":
 			System.err.println("the parameters of the method ' " + this.errID
 					+ "() ' don't match" + " --- at line " + this.errLine);
-
 			break;
 		case "NotBoolean":
 			System.err.println("the type of the expression must be boolean!"

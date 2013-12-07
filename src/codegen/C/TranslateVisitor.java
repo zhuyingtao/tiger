@@ -70,7 +70,7 @@ public class TranslateVisitor implements ast.Visitor {
 	@Override
 	public void visit(ast.exp.Call e) {
 		e.exp.accept(this);
-		String newid = this.genId();// x_i
+		String newid = this.genId();
 		this.tmpVars.add(new codegen.C.dec.Dec(
 				new codegen.C.type.Class(e.type), newid));
 		codegen.C.exp.T exp = this.exp;
@@ -81,7 +81,9 @@ public class TranslateVisitor implements ast.Visitor {
 				args.add(this.exp);
 			}
 		}
-		this.exp = new codegen.C.exp.Call(newid, exp, e.id, args);
+		e.rt.accept(this);
+		codegen.C.type.T retType = this.type;
+		this.exp = new codegen.C.exp.Call(newid, exp, e.id, args, retType);
 		return;
 	}
 

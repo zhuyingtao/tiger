@@ -324,7 +324,6 @@ public class PrettyPrintVisitor implements Visitor {
 				dec.type.accept(this);
 				this.say(" " + dec.id + ";\n");
 			}
-
 			localNames.add(dec.id);
 		}
 
@@ -484,7 +483,7 @@ public class PrettyPrintVisitor implements Visitor {
 
 		this.sayln("#define NULL ((void*)0)\n");
 		this.sayln("#include <string.h>");
-		
+
 		this.sayln("// structures");
 		for (codegen.C.classs.T c : p.classes) {
 			c.accept(this);

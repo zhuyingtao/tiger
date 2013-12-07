@@ -444,4 +444,3 @@ void Tiger_gc() {
 	fprintf(out, "===============Collect Garbage End==============\n");
 	fflush(out);
 }
-
