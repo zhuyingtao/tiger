@@ -7,6 +7,7 @@ public class While extends T {
 	public codegen.C.exp.T condition;
 	public T body;
 
+
 	public While(codegen.C.exp.T condition, T body) {
 		this.condition = condition;
 		this.body = body;

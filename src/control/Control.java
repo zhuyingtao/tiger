@@ -22,6 +22,7 @@ public class Control {
 		None, Bmp, Pdf, Ps, Jpg
 	}
 
+
 	public static Visualize_Kind_t visualize = Visualize_Kind_t.None;
 
 	// elaborator

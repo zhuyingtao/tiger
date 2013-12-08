@@ -32,11 +32,13 @@ public class TranslateVisitor implements ast.Visitor {
 		this.program = null;
 	}
 
+
 	// //////////////////////////////////////////////////////
 	//
 	public String genId() {
 		return util.Temp.next();
 	}
+
 
 	// /////////////////////////////////////////////////////
 	// expressions
@@ -67,6 +69,7 @@ public class TranslateVisitor implements ast.Visitor {
 		this.exp = new codegen.C.exp.ArraySelect(array, index);
 	}
 
+
 	@Override
 	public void visit(ast.exp.Call e) {
 		e.exp.accept(this);
@@ -86,6 +89,7 @@ public class TranslateVisitor implements ast.Visitor {
 		this.exp = new codegen.C.exp.Call(newid, exp, e.id, args, retType);
 		return;
 	}
+
 
 	@Override
 	// in C,0 is false.

@@ -105,6 +105,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		this.type = new ast.type.Int();
 	}
 
+
 	@Override
 	public void visit(ast.exp.Call e) {
 		ast.type.T leftty;

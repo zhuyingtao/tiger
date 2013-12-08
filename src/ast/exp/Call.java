@@ -22,12 +22,14 @@ public class Call extends T
     this.type = null;
     this.at = null;
     this.rt = null;
+
   }
   
   public Call(T exp, String id, java.util.LinkedList<T> args,int lineNum)
   {
    this(exp, id, args);
    this.lineNum=lineNum;
+
   }
 
   @Override
