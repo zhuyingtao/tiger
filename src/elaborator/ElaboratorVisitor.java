@@ -26,6 +26,12 @@ public class ElaboratorVisitor implements ast.Visitor {
 					+ this.errLine);
 
 			break;
+		case "NotInitial":
+			System.err.println("the identify ' " + this.errID
+					+ " ' has not been initialized!" + " --- at line "
+					+ this.errLine);
+
+			break;
 		case "NotSame":
 			System.err.println("the type of the expression"
 					+ " between the operator ' " + this.errID
@@ -59,10 +65,26 @@ public class ElaboratorVisitor implements ast.Visitor {
 			System.err.println("the method print() can only print Integer now!"
 					+ " --- at line " + this.errLine);
 			break;
+		case "FinalArgument":
+			System.err.println("the identify ' " + this.errID
+					+ " ' is a final argument , so it cannot be changed !"
+					+ " --- at line " + this.errLine);
+			break;
+		case "FinalChange":
+			System.err.println("the identify ' " + this.errID
+					+ " ' is a final variable and has been "
+					+ "initialized , so it cannot be changed again !"
+					+ " --- at line " + this.errLine);
+
+			break;
+		case "FinalClass":
+			System.err.println("the class ' " + this.errID
+					+ " ' is a final class , so it cannot be extended !");
+			break;
 		default:
 			System.out.println(error);
 		}
-		System.exit(1);
+		// System.exit(1);
 	}
 
 	// /////////////////////////////////////////////////////
@@ -189,8 +211,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Id e) {
+		// #1 : check whether the id has been declared
 		// first look up the id in method table
-		ast.type.T type = this.methodTable.get(e.id);
+		ast.type.T type = this.methodTable.getType(e.id);
 		// if search failed, then s.id must be a class field.
 		if (type == null) {
 			type = this.classTable.get(this.currentClass, e.id);
@@ -203,6 +226,14 @@ public class ElaboratorVisitor implements ast.Visitor {
 			this.errID = e.id;
 			error("NotDeclare");
 		}
+		// #2 : check whether the id has been initialized
+		boolean hasInitial = this.methodTable.getIdRef(e.id).hasInitial;
+		if (!hasInitial && !e.isField) {
+			this.errLine = e.lineNum;
+			this.errID = e.id;
+			error("NotInitial");
+		}
+
 		this.type = type;
 		// record this type on this node for future use.
 		e.type = type;
@@ -307,8 +338,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 	// statements
 	@Override
 	public void visit(ast.stm.Assign s) {
+		// # 1 . check whether the id has been declared;
 		// first look up the id in method table
-		ast.type.T type = this.methodTable.get(s.id);
+		ast.type.T type = this.methodTable.getType(s.id);
 		// if failed,then search the class table
 		if (type == null) {
 			type = this.classTable.get(this.currentClass, s.id);
@@ -321,6 +353,22 @@ public class ElaboratorVisitor implements ast.Visitor {
 			this.errID = s.id;
 			error("NotDeclare");
 		}
+		// #2 . check whether the id is a final argument
+		boolean isArgument = this.methodTable.isArgument(s.id);
+		if (isArgument) {
+			this.errLine = s.exp.lineNum;
+			this.errID = s.id;
+			error("FinalArgument");
+		}
+		// #3 . check whether the id is a final variable and has been
+		// initialized;
+		ast.exp.Id idRef = this.methodTable.getIdRef(s.id);
+		if (idRef.hasInitial && idRef.type.isFinal) {
+			this.errLine = s.exp.lineNum;
+			this.errID = s.id;
+			error("FinalChange");
+		}
+
 		s.exp.accept(this);
 		s.type = type; // not this.type ,this.type now is the exp type
 		if (!this.type.toString().equals(type.toString())) {
@@ -328,12 +376,13 @@ public class ElaboratorVisitor implements ast.Visitor {
 			this.errID = "=";
 			error("NotSame");
 		}
+		this.methodTable.getIdRef(s.id).hasInitial = true;
 		return;
 	}
 
 	@Override
 	public void visit(ast.stm.AssignArray s) {
-		ast.type.T type = this.methodTable.get(s.id);
+		ast.type.T type = this.methodTable.getType(s.id);
 		if (type == null) {
 			type = this.classTable.get(this.currentClass, s.id);
 			if (type != null)
@@ -457,6 +506,12 @@ public class ElaboratorVisitor implements ast.Visitor {
 	public void visit(ast.classs.Class c) {
 		this.currentClass = c.id;
 
+		if (c.extendss != null) {
+			if (this.classTable.get(c.extendss).isFinal) {
+				this.errID = c.extendss;
+				error("FinalClass");
+			}
+		}
 		for (ast.method.T m : c.methods) {
 			m.accept(this);
 		}
@@ -482,12 +537,12 @@ public class ElaboratorVisitor implements ast.Visitor {
 	// step 1: build class table
 	// class table for Main class
 	private void buildMainClass(ast.mainClass.MainClass main) {
-		this.classTable.put(main.id, new ClassBinding(null));
+		this.classTable.put(main.id, new ClassBinding(null, false));
 	}
 
 	// class table for normal classes
 	private void buildClass(ast.classs.Class c) {
-		this.classTable.put(c.id, new ClassBinding(c.extendss));
+		this.classTable.put(c.id, new ClassBinding(c.extendss, c.isFinal));
 		for (ast.dec.T dec : c.decs) {
 			ast.dec.Dec d = (ast.dec.Dec) dec;
 			this.classTable.put(c.id, d.id, d.type, d.lineNum);

@@ -53,6 +53,9 @@ public class Token {
 		TOKEN_TRUE, // "true"
 		TOKEN_VOID, // "void"
 		TOKEN_WHILE, // "while"
+		
+		//new add
+		TOKEN_FINAL,
 	}
 
 	class Position {

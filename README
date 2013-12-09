@@ -1,0 +1,13 @@
+===============Final Project Log===============
+This is our final project for tiger.
+We choose the topic about achieving a more powerful miniJava.
+This is a very open topic,we can do whatever we want,such as add more operators,more 
+keywords,interface,exception and so on.
+Be active and enjoy it !
+
+2013/12/09
+1. add 'final' into tiger,mainly include 3 cases : final in class ,final in variable
+   and final in argument, final in method is not included.Besides,we add an new error 
+   type named "NotInitial" which is not referred before.
+   Adding new words to tiger seems easy to implement,but it is rather complex in some
+   cases , so be careful enough !

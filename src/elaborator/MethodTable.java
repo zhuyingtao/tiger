@@ -5,20 +5,35 @@ import java.util.Map.Entry;
 
 import ast.type.T;
 
-public class MethodTable {
-	// private java.util.Hashtable<String, ast.type.T> table;
-	private java.util.LinkedHashMap<String, ast.type.T> table;
-	private java.util.LinkedHashMap<String, Boolean> isUsed;// exercise 9
+class VarInfo {
+	ast.type.T type;
+	boolean isUsed;
+	boolean isFormal;
+	int varLine;
+}
 
+public class MethodTable {
+
+	private java.util.LinkedHashMap<String, ast.type.T> table;
+	private java.util.LinkedHashMap<String, ast.exp.Id> table2;
+
+	private java.util.LinkedHashMap<String, Boolean> isUsed;// exercise 9
 	// mark the variable lineNum when it is declared
 	private java.util.LinkedHashMap<String, Integer> varLines;
+	private java.util.LinkedList<String> formalTable;
+
 	String mid; // mark the name of the method
 
+	// use this structure may be more reasonable,but I am lazy to do that...
+	// private java.util.LinkedHashMap<String, VarInfo> varTable;
+
 	public MethodTable() {
-		// this.table = new java.util.Hashtable<String, ast.type.T>();
 		this.table = new java.util.LinkedHashMap<String, ast.type.T>();
+		this.table2 = new java.util.LinkedHashMap<String, ast.exp.Id>();
 		this.isUsed = new java.util.LinkedHashMap<String, Boolean>();
 		this.varLines = new java.util.LinkedHashMap<String, Integer>();
+		this.formalTable = new java.util.LinkedList<String>();
+
 	}
 
 	// Duplication is not allowed
@@ -32,7 +47,9 @@ public class MethodTable {
 				System.exit(1);
 			}
 			this.table.put(decc.id, decc.type);
+			this.table2.put(decc.id, decc.idRef);
 			// the parameter don't need to check isUsed
+			this.formalTable.add(decc.id);
 		}
 
 		for (ast.dec.T dec : locals) {
@@ -42,6 +59,7 @@ public class MethodTable {
 				System.exit(1);
 			}
 			this.table.put(decc.id, decc.type);
+			this.table2.put(decc.id, decc.idRef);
 			this.isUsed.put(decc.id, false);
 			this.varLines.put(decc.id, decc.lineNum);
 		}
@@ -49,17 +67,20 @@ public class MethodTable {
 	}
 
 	// return null for non-existing keys
-	public ast.type.T get(String id) {
+	public ast.type.T getType(String id) {
 		ast.type.T type = this.table.get(id);
 		if (type != null)
 			this.isUsed.put(id, true);
 		return type;
 	}
 
+	public ast.exp.Id getIdRef(String id) {
+		ast.exp.Id idRef = this.table2.get(id);
+		return idRef;
+	}
+
 	public void dump() {
 		System.out.println("====== " + mid + " Method ======");
-		// Enumeration<String> id = this.table.keys();
-		// Enumeration<ast.type.T> type = this.table.elements();
 		Iterator<Entry<String, T>> iterator = this.table.entrySet().iterator();
 		int i = 0;
 		while (iterator.hasNext()) {
@@ -79,8 +100,6 @@ public class MethodTable {
 	public void isVariableUsed() {
 		Iterator<Entry<String, Boolean>> iterator = this.isUsed.entrySet()
 				.iterator();
-		// Enumeration<String> id = this.isUsed.keys();
-		// Enumeration<Boolean> use = this.isUsed.elements();
 		while (iterator.hasNext()) {
 			Entry<String, Boolean> entry = iterator.next();
 			String nowId = entry.getKey();
@@ -90,5 +109,12 @@ public class MethodTable {
 						+ " ' at line " + this.varLines.get(nowId)
 						+ " is never used ! ---- in Method " + mid + "();");
 		}
+	}
+
+	public boolean isArgument(String id) {
+		boolean flag = false;
+		if (this.formalTable.contains(id))
+			flag = true;
+		return flag;
 	}
 }

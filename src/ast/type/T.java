@@ -7,5 +7,6 @@ public abstract class T implements ast.Acceptable
   // int[]: 1
   // class: 2
   // Such that one can easily tell who is who
+  public boolean isFinal;
   public abstract int getNum();
 }

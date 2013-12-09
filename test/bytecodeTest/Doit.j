@@ -14,6 +14,16 @@
 .method public doit(I)I
 .limit stack 4096
 .limit locals 5
+    iload 2
+    getstatic java/lang/System/out Ljava/io/PrintStream;
+    swap
+    invokevirtual java/io/PrintStream/println(I)V
+    ldc 10
+    istore 2
+    ldc 20
+    istore 2
+    ldc 10
+    istore 1
     ldc 0
     istore 3
     ldc 0

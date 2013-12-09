@@ -19,7 +19,7 @@ public class Lexer {
 	String[] keyWords = { "boolean", "class", "else", "extends", "false", "if",
 			"int", "length", "main", "new", "out", "println", "public",
 			"return", "static", "String", "System", "this", "true", "void",
-			"while" };
+			"while", "final" };
 
 	public void posChange(int c) {
 		if (c == '\t')

@@ -5,11 +5,11 @@ public class Id extends T {
 	public ast.type.T type; // type of the id
 	public boolean isField; // whether or not this is a class field
 
+	public boolean hasInitial; // whether or not this has been initialized
 
 	public Id(String id) {
 		this.id = id;
 		this.type = null;
-		this.isField = false;
 	}
 
 	public Id(String id, int lineNum) {
@@ -27,5 +27,9 @@ public class Id extends T {
 	public void accept(ast.Visitor v) {
 		v.visit(this);
 		return;
+	}
+
+	public String toString() {
+		return this.id;
 	}
 }

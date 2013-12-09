@@ -338,6 +338,9 @@ public class Parser {
 	// -> boolean
 	// -> int
 	// -> id
+	// ==========add final============
+	// Type -> (final)? SubType
+	// SubType->...
 	Token idAfter;
 	boolean comeFromVarDecls2 = false;// define this var to distinguish whether
 										// we have advance the next token or not
@@ -346,6 +349,11 @@ public class Parser {
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a type.
 		/************** My Code ****************/
+		boolean isFinal = false;
+		if (current.kind == Kind.TOKEN_FINAL) {
+			isFinal = true;
+			advance();
+		}
 		switch (current.kind) {
 		case TOKEN_INT:
 			eatToken(Kind.TOKEN_INT);
@@ -356,12 +364,12 @@ public class Parser {
 				eatToken(Kind.TOKEN_RBRACK);
 			}
 			if (isIntArray)
-				return new ast.type.IntArray();
+				return new ast.type.IntArray(isFinal);
 			else
-				return new ast.type.Int();
+				return new ast.type.Int(isFinal);
 		case TOKEN_BOOLEAN:
 			eatToken(Kind.TOKEN_BOOLEAN);
-			return new ast.type.Boolean();
+			return new ast.type.Boolean(isFinal);
 		case TOKEN_ID:
 			String id = current.lexeme;
 			if (comeFromVarDecls2) {
@@ -369,7 +377,7 @@ public class Parser {
 				comeFromVarDecls2 = false;
 			} else
 				eatToken(Kind.TOKEN_ID);
-			return new ast.type.Class(id);
+			return new ast.type.Class(id, isFinal);
 		default:
 			error();
 		}
@@ -394,9 +402,7 @@ public class Parser {
 		// VarDecl* and Statement* can both start with "id",so it is ambiguous.
 		// To distinguish it,we can read the next token.
 		LinkedList<ast.dec.T> decs = new LinkedList<>();
-		while (current.kind == Kind.TOKEN_INT
-				|| current.kind == Kind.TOKEN_BOOLEAN
-				|| current.kind == Kind.TOKEN_ID) {
+		while (isTypePre()) {
 			if (current.kind == Kind.TOKEN_ID) {
 				idAfter = lexer.nextToken();
 				if (idAfter.kind == Kind.TOKEN_ASSIGN
@@ -419,9 +425,7 @@ public class Parser {
 	// FormalRest -> , Type id
 	private LinkedList<ast.dec.T> parseFormalList() {
 		LinkedList<ast.dec.T> formals = new LinkedList<>();
-		if (current.kind == Kind.TOKEN_INT
-				|| current.kind == Kind.TOKEN_BOOLEAN
-				|| current.kind == Kind.TOKEN_ID) {
+		if (isTypePre()) {
 			ast.type.T type = parseType();
 			String id = current.lexeme;
 			int lineNum = current.getLineNum();
@@ -474,9 +478,14 @@ public class Parser {
 		return list;
 	}
 
-	// ClassDecl -> class id { VarDecl* MethodDecl* }
-	// -> class id extends id { VarDecl* MethodDecl* }
+	// ClassDecl -> (final)? class id { VarDecl* MethodDecl* }
+	// ->(final)? class id extends id { VarDecl* MethodDecl* }
 	private ast.classs.T parseClassDecl() {
+		boolean isFinal = false;
+		if (current.kind == Kind.TOKEN_FINAL) {
+			isFinal = true;
+			advance();
+		}
 		eatToken(Kind.TOKEN_CLASS);
 		String id = current.lexeme;
 		eatToken(Kind.TOKEN_ID);
@@ -492,17 +501,25 @@ public class Parser {
 		LinkedList<ast.dec.T> decs = parseVarDecls();
 		LinkedList<ast.method.T> methods = parseMethodDecls();
 		eatToken(Kind.TOKEN_RBRACE);
-		if (hasExtends)
-			return new ast.classs.Class(id, extendsId, decs, methods);
-		else
-			return new ast.classs.Class(id, null, decs, methods);
+
+		if (hasExtends) {
+			ast.classs.Class t = new ast.classs.Class(id, extendsId, decs,
+					methods);
+			t.setFinal(isFinal);
+			return t;
+		} else {
+			ast.classs.Class t = new ast.classs.Class(id, null, decs, methods);
+			t.setFinal(isFinal);
+			return t;
+		}
 	}
 
 	// ClassDecls -> ClassDecl ClassDecls
 	// ->
 	private LinkedList<ast.classs.T> parseClassDecls() {
 		LinkedList<ast.classs.T> classes = new LinkedList<>();
-		while (current.kind == Kind.TOKEN_CLASS) {
+		while (current.kind == Kind.TOKEN_CLASS
+				|| current.kind == Kind.TOKEN_FINAL) {
 			ast.classs.T clas = parseClassDecl();
 			classes.add(clas);
 		}
@@ -556,4 +573,13 @@ public class Parser {
 		// System.out.println("Your Program is Valid!!");
 		return prog;
 	}
+
+	public boolean isTypePre() {
+		boolean typePrefix = current.kind == Kind.TOKEN_INT
+				|| current.kind == Kind.TOKEN_BOOLEAN
+				|| current.kind == Kind.TOKEN_ID
+				|| current.kind == Kind.TOKEN_FINAL;
+		return typePrefix;
+	}
+
 }

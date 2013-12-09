@@ -25,6 +25,6 @@ public class Control {
 		Bytecode, C, X86, Dalvik
 	}
 
-	public static Codegen_Kind_t codegen = Codegen_Kind_t.C;
+	public static Codegen_Kind_t codegen = Codegen_Kind_t.Bytecode;
 
 }

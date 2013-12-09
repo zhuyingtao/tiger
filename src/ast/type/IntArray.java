@@ -2,27 +2,27 @@ package ast.type;
 
 import ast.Visitor;
 
-public class IntArray extends T
-{
-  public IntArray()
-  {
-  }
+public class IntArray extends T {
 
-  @Override
-  public String toString()
-  {
-    return "@int[]";
-  }
+	public IntArray() {
+	}
 
-  @Override
-  public int getNum()
-  {
-    return 1;
-  }
+	public IntArray(boolean isFinal) {
+		this.isFinal = isFinal;
+	}
 
-  @Override
-  public void accept(Visitor v)
-  {
-    v.visit(this);
-  }
+	@Override
+	public String toString() {
+		return "@int[]";
+	}
+
+	@Override
+	public int getNum() {
+		return 1;
+	}
+
+	@Override
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
 }

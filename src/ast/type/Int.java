@@ -2,27 +2,26 @@ package ast.type;
 
 import ast.Visitor;
 
-public class Int extends T
-{
-  public Int()
-  {
-  }
+public class Int extends T {
 
-  @Override
-  public String toString()
-  {
-    return "@int";
-  }
+	public Int(){};
+	
+	public Int(boolean isFinal) {
+		this.isFinal = isFinal;
+	}
 
-  @Override
-  public void accept(Visitor v)
-  {
-    v.visit(this);
-  }
+	@Override
+	public String toString() {
+		return "@int";
+	}
 
-  @Override
-  public int getNum()
-  {
-    return 0;
-  }
+	@Override
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
+
+	@Override
+	public int getNum() {
+		return 0;
+	}
 }

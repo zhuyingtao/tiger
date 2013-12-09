@@ -12,12 +12,15 @@ public class ClassBinding {
 	// mark the field lineNum when it is declared
 	public LinkedHashMap<String, Integer> fieldLines;
 
-	public ClassBinding(String extendss) {
+	boolean isFinal;
+
+	public ClassBinding(String extendss, boolean isFinal) {
 		this.extendss = extendss;
 		this.fields = new LinkedHashMap<String, ast.type.T>();
 		this.methods = new LinkedHashMap<String, MethodType>();
 		this.isUsed = new LinkedHashMap<String, Boolean>();
 		this.fieldLines = new LinkedHashMap<String, Integer>();
+		this.isFinal = isFinal;
 	}
 
 	public ClassBinding(String extendss,

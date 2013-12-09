@@ -7,7 +7,6 @@ import lexer.Lexer;
 import lexer.Token;
 import lexer.Token.Kind;
 import parser.Parser;
-import control.CommandLine;
 import control.Control;
 import control.Control.Codegen_Kind_t;
 
@@ -19,10 +18,10 @@ public class Tiger {
 
 		// /////////////////////////////////////////////////////
 		// handle command line arguments
-		CommandLine cmd = new CommandLine();
-		String fname = cmd.scan(args);
+		// CommandLine cmd = new CommandLine();
+		// String fname = cmd.scan(args);
 
-//		 String fname = "test/javaSrc/TreeVisitor.java";
+		String fname = "test/javaSrc/NewTest/TestFinal.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -53,10 +52,10 @@ public class Tiger {
 			System.exit(1);
 		}
 
-		if (fname == null) {
-			cmd.usage();
-			return;
-		}
+		// if (fname == null) {
+		// cmd.usage();
+		// return;
+		// }
 
 		Control.fileName = fname.substring(fname.lastIndexOf("/") + 1);
 
@@ -88,9 +87,7 @@ public class Tiger {
 		try {
 			fstream = new BufferedInputStream(new FileInputStream(fname));
 			parser = new Parser(fname, fstream);
-
 			theAst = parser.parse();
-
 			fstream.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -160,6 +157,19 @@ public class Tiger {
 					run.exec("java -jar jasmin.jar " + ppbc.jNames.get(i)
 							+ " -d test/bytecodeTest");
 				}
+				// String main = Control.fileName.split("\\.")[0];
+				// System.out.println(main);
+				// // run.exec("cmd.exe cd test");
+				// // run.exec("cmd.exe cd bytecodeTest");
+				// Process process=run.exec("java " + main);
+				// BufferedReader br = new BufferedReader(new InputStreamReader(
+				// process.getInputStream()));
+				// String str = br.readLine();
+				// while (str != null) {
+				// System.out.println(str);
+				// str = br.readLine();
+				// }
+
 				// String[] ss=ppbc.jNames.get(0).split("\\.");
 				// the regex . can present any character,so use "\\."
 				// run.exec("java " + ppbc.jNames.get(0).split("\\.")[0]);
