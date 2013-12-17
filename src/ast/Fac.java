@@ -24,7 +24,7 @@ public class Fac
           new util.Flist<ast.exp.T>().addAll(new ast.exp.Num(10)))));
 
   // // class "Fac"
-  static ast.classs.Class fac = new ast.classs.Class("Fac", null,
+  static ast.classs.Class fac = new ast.classs.Class("Fac", null,null,
       new util.Flist<ast.dec.T>().addAll(),
       new util.Flist<ast.method.T>().addAll(new ast.method.Method(
           new ast.type.Int(), "ComputeFac", new util.Flist<ast.dec.T>()
@@ -75,7 +75,7 @@ public class Fac
 	          new util.Flist<ast.exp.T>().addAll(new ast.exp.Num(101)))));
   
   // class: "Doit"
-  static ast.classs.Class doit = new ast.classs.Class("Doit", null,
+  static ast.classs.Class doit = new ast.classs.Class("Doit", null,null,
 	      new util.Flist<ast.dec.T>().addAll(),
 	      new util.Flist<ast.method.T>().addAll(new ast.method.Method(
 	          new ast.type.Int(), "doit", 

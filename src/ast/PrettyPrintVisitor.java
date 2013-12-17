@@ -288,6 +288,12 @@ public class PrettyPrintVisitor implements Visitor {
 			this.say(" " + dec.id + (i == m.formals.size() - 1 ? "" : ", "));
 			i++;
 		}
+
+		if (m.isAbstract) {
+			this.sayln(");");
+			return;
+		}
+
 		this.sayln(")");
 		this.sayln("  {");
 
@@ -295,7 +301,12 @@ public class PrettyPrintVisitor implements Visitor {
 			ast.dec.Dec dec = (ast.dec.Dec) d;
 			this.say("    ");
 			dec.type.accept(this);
-			this.say(" " + dec.id + ";\n");
+			this.say(" " + dec.id);
+			if (dec.assign != null) {
+				this.say(" = ");
+				dec.assign.exp.accept(this);
+			}
+			this.sayln(" ;");
 		}
 		this.sayln("");
 		for (ast.stm.T s : m.stms)
@@ -313,9 +324,16 @@ public class PrettyPrintVisitor implements Visitor {
 	public void visit(ast.classs.Class c) {
 		this.say("class " + c.id);
 		if (c.extendss != null)
-			this.sayln(" extends " + c.extendss);
-		else
-			this.sayln("");
+			this.say(" extends " + c.extendss);
+
+		if (c.implementss != null) {
+			this.say(" implements ");
+			for (int i = 0; i < c.implementss.size(); i++) {
+				this.say(c.implementss.get(i));
+				this.say(i == c.implementss.size() - 1 ? "" : ",");
+			}
+		}
+		this.sayln("");
 
 		this.sayln("{");
 
@@ -323,9 +341,14 @@ public class PrettyPrintVisitor implements Visitor {
 			ast.dec.Dec dec = (ast.dec.Dec) d;
 			this.say("  ");
 			dec.type.accept(this);
-			this.say(" ");
-			this.sayln(dec.id + ";");
+			this.say(" " + dec.id);
+			if (dec.assign != null) {
+				this.say(" = ");
+				dec.assign.exp.accept(this);
+			}
+			this.sayln(" ;");
 		}
+
 		this.sayln("");
 		for (ast.method.T mthd : c.methods)
 			mthd.accept(this);
@@ -356,4 +379,39 @@ public class PrettyPrintVisitor implements Visitor {
 		}
 		System.out.println("\n\n");
 	}
+
+	@Override
+	public void visit(ast.classs.Interface i) {
+		// TODO Auto-generated method stub
+		this.say("interface " + i.id);
+		if (i.extendss != null)
+			this.sayln(" extends " + i.extendss);
+		else
+			this.sayln("");
+
+		this.sayln("{");
+
+		for (ast.dec.T d : i.decs) {
+			ast.dec.Dec dec = (ast.dec.Dec) d;
+			this.say("  ");
+			dec.type.accept(this);
+			this.say(" " + dec.id);
+			if (dec.assign != null) {
+				this.say(" = ");
+				dec.assign.exp.accept(this);
+			}
+			this.sayln(" ;");
+		}
+
+		this.sayln("");
+		for (ast.method.T mthd : i.methods)
+			mthd.accept(this);
+		this.sayln("}");
+	}
+
+	// @Override
+	// public void visit(ast.exp.AddOne addOne) {
+	// // TODO Auto-generated method stub
+	//
+	// }
 }

@@ -19,7 +19,7 @@ public class Lexer {
 	String[] keyWords = { "boolean", "class", "else", "extends", "false", "if",
 			"int", "length", "main", "new", "out", "println", "public",
 			"return", "static", "String", "System", "this", "true", "void",
-			"while", "final" };
+			"while", "final", "break", "interface", "implements" };
 
 	public void posChange(int c) {
 		if (c == '\t')
@@ -54,7 +54,14 @@ public class Lexer {
 
 		switch (c) {
 		case '+':
-			return new Token(Kind.TOKEN_ADD, lineNum, colNum++);
+			this.fstream.mark(0);
+			c = this.fstream.read();
+			if (c == '+')
+				return new Token(Kind.TOKEN_ADDONE, lineNum, colNum++);
+			else {
+				this.fstream.reset();
+				return new Token(Kind.TOKEN_ADD, lineNum, colNum++);
+			}
 
 			/******************* My Code ***********************/
 		case '=':
@@ -82,7 +89,14 @@ public class Lexer {
 		case ';':
 			return new Token(Kind.TOKEN_SEMI, lineNum, colNum++);
 		case '-':
-			return new Token(Kind.TOKEN_SUB, lineNum, colNum++);
+			this.fstream.mark(0);
+			c = this.fstream.read();
+			if (c == '-')
+				return new Token(Kind.TOKEN_SUBONE, lineNum, colNum++);
+			else {
+				this.fstream.reset();
+				return new Token(Kind.TOKEN_SUB, lineNum, colNum++);
+			}
 		case '*':
 			return new Token(Kind.TOKEN_TIMES, lineNum, colNum++);
 		case '&':

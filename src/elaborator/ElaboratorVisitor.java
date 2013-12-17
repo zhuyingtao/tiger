@@ -1,5 +1,7 @@
 package elaborator;
 
+import ast.classs.Interface;
+
 public class ElaboratorVisitor implements ast.Visitor {
 	public ClassTable classTable; // symbol table for class
 	public MethodTable methodTable; // symbol table for each method
@@ -227,7 +229,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 			error("NotDeclare");
 		}
 		// #2 : check whether the id has been initialized
-		boolean hasInitial = this.methodTable.getIdRef(e.id).hasInitial;
+		ast.exp.Id idRef = this.methodTable.getIdRef(e.id);
+		boolean hasInitial = false;
+		if (idRef != null) {
+			hasInitial = this.methodTable.getIdRef(e.id).hasInitial;
+		}
 		if (!hasInitial && !e.isField) {
 			this.errLine = e.lineNum;
 			this.errID = e.id;
@@ -355,7 +361,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		}
 		// #2 . check whether the id is a final argument
 		boolean isArgument = this.methodTable.isArgument(s.id);
-		if (isArgument) {
+		if (type.isFinal && isArgument) {
 			this.errLine = s.exp.lineNum;
 			this.errID = s.id;
 			error("FinalArgument");
@@ -363,7 +369,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 		// #3 . check whether the id is a final variable and has been
 		// initialized;
 		ast.exp.Id idRef = this.methodTable.getIdRef(s.id);
-		if (idRef.hasInitial && idRef.type.isFinal) {
+		if (type.isFinal && idRef != null && idRef.hasInitial) {
 			this.errLine = s.exp.lineNum;
 			this.errID = s.id;
 			error("FinalChange");
@@ -376,7 +382,9 @@ public class ElaboratorVisitor implements ast.Visitor {
 			this.errID = "=";
 			error("NotSame");
 		}
-		this.methodTable.getIdRef(s.id).hasInitial = true;
+
+		if (idRef != null)
+			idRef.hasInitial = true;
 		return;
 	}
 
@@ -512,6 +520,7 @@ public class ElaboratorVisitor implements ast.Visitor {
 				error("FinalClass");
 			}
 		}
+		
 		for (ast.method.T m : c.methods) {
 			m.accept(this);
 		}
@@ -581,5 +590,11 @@ public class ElaboratorVisitor implements ast.Visitor {
 		for (ast.classs.T c : p.classes) {
 			c.accept(this);
 		}
+	}
+
+	@Override
+	public void visit(Interface i) {
+		// TODO Auto-generated method stub
+
 	}
 }

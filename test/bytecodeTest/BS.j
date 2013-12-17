@@ -25,7 +25,7 @@
     istore 3
     aload 0
     ldc 8
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_0
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -40,7 +40,7 @@ L_0:
 L_1:
     aload 0
     ldc 19
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_2
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -55,7 +55,7 @@ L_2:
 L_3:
     aload 0
     ldc 20
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_4
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -70,7 +70,7 @@ L_4:
 L_5:
     aload 0
     ldc 21
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_6
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -85,7 +85,7 @@ L_6:
 L_7:
     aload 0
     ldc 37
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_8
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -100,7 +100,7 @@ L_8:
 L_9:
     aload 0
     ldc 38
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_10
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -115,7 +115,7 @@ L_10:
 L_11:
     aload 0
     ldc 39
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_12
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -130,7 +130,7 @@ L_12:
 L_13:
     aload 0
     ldc 50
-    invokevirtual BS/Search(I)I
+    invokevirtual BS/Search(I)Z
     ifeq L_14
     ldc 1
     getstatic java/lang/System/out Ljava/io/PrintStream;
@@ -146,7 +146,7 @@ L_15:
     ldc 999
     ireturn
 .end method
-.method public Search(I)I
+.method public Search(I)Z
 .limit stack 4096
 .limit locals 10
     ldc 0
@@ -205,7 +205,7 @@ L_19:
     aload 0
     iload 7
     iload 1
-    invokevirtual BS/Compare(II)I
+    invokevirtual BS/Compare(II)Z
     ifeq L_23
     ldc 0
     istore 5
@@ -236,7 +236,7 @@ L_16:
     aload 0
     iload 7
     iload 1
-    invokevirtual BS/Compare(II)I
+    invokevirtual BS/Compare(II)Z
     ifeq L_30
     ldc 1
     istore 2
@@ -283,7 +283,7 @@ L_32:
     iload 2
     ireturn
 .end method
-.method public Compare(II)I
+.method public Compare(II)Z
 .limit stack 4096
 .limit locals 6
     ldc 0

@@ -1,7 +1,9 @@
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import lexer.Lexer;
 import lexer.Token;
@@ -21,7 +23,7 @@ public class Tiger {
 		// CommandLine cmd = new CommandLine();
 		// String fname = cmd.scan(args);
 
-		String fname = "test/javaSrc/NewTest/TestFinal.java";
+		String fname = "test/javaSrc/NewTest/TestFor.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -141,42 +143,54 @@ public class Tiger {
 		// file, or call java to run the bytecode file.
 		// Your code:
 		Runtime run = Runtime.getRuntime();
+		Process process = null;
 		if (control.Control.codegen == Codegen_Kind_t.C) {
 			try {
 				String file = "test/ccodeTest/" + Control.fileName;
 				run.exec("gcc " + file + ".c  runtime/runtime.c -o " + file
 						+ ".exe");
+				process = run.exec(file + ".exe");
+
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return;
 		} else if (control.Control.codegen == Codegen_Kind_t.Bytecode) {
 			try {
 				for (int i = 0; i < ppbc.jNames.size(); i++) {
 					run.exec("java -jar jasmin.jar " + ppbc.jNames.get(i)
 							+ " -d test/bytecodeTest");
 				}
-				// String main = Control.fileName.split("\\.")[0];
-				// System.out.println(main);
-				// // run.exec("cmd.exe cd test");
-				// // run.exec("cmd.exe cd bytecodeTest");
-				// Process process=run.exec("java " + main);
-				// BufferedReader br = new BufferedReader(new InputStreamReader(
-				// process.getInputStream()));
-				// String str = br.readLine();
-				// while (str != null) {
-				// System.out.println(str);
-				// str = br.readLine();
-				// }
-
-				// String[] ss=ppbc.jNames.get(0).split("\\.");
+				// fileName now is '*.java';
 				// the regex . can present any character,so use "\\."
-				// run.exec("java " + ppbc.jNames.get(0).split("\\.")[0]);
+				String main = Control.fileName.split("\\.")[0];
+				// Here you cannot write the command like this:
+				// "java test/bytecodeTest/%main% " and I don't know why;
+				process = run.exec("java -classpath test/bytecodeTest " + main);
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		}
+
+		// print the running result in console;
+		BufferedReader br = new BufferedReader(new InputStreamReader(
+				process.getInputStream()));
+		try {
+			String str = br.readLine();
+			if (str == null) {
+				// that is to say an error occurred,so print the error info;
+				br = new BufferedReader(new InputStreamReader(
+						process.getErrorStream()));
+				str = br.readLine();
+			}
+			while (str != null) {
+				System.out.println(str);
+				str = br.readLine();
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 }

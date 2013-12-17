@@ -5,6 +5,9 @@ import java.util.LinkedList;
 import lexer.Lexer;
 import lexer.Token;
 import lexer.Token.Kind;
+import ast.classs.Interface;
+import ast.dec.Dec;
+import ast.stm.Assign;
 
 public class Parser {
 	Lexer lexer;
@@ -82,6 +85,14 @@ public class Parser {
 	// -> id
 	// -> new int [exp]
 	// -> new id ()
+	// -> id ++ | --
+	// -> ++ | -- id
+
+	// these three flags are used for ++
+	int addOrSub = 0; // 1 is add , 2 is sub
+	boolean idFirst = false;
+	String autoId = null;
+
 	private ast.exp.T parseAtomExp() {
 		switch (current.kind) {
 		case TOKEN_LPAREN:
@@ -105,7 +116,17 @@ public class Parser {
 			return new ast.exp.This(current.getLineNum());
 		case TOKEN_ID:
 			ast.exp.Id id = new ast.exp.Id(current.lexeme, current.getLineNum());
-			advance();
+			autoId = current.lexeme;
+			eatToken(Kind.TOKEN_ID);
+			if (current.kind == Kind.TOKEN_ADDONE) {
+				addOrSub = 1;
+				idFirst = true;
+				advance();
+			} else if (current.kind == Kind.TOKEN_SUBONE) {
+				addOrSub = 2;
+				idFirst = true;
+				advance();
+			}
 			return id;
 		case TOKEN_NEW: {
 			advance();
@@ -128,6 +149,30 @@ public class Parser {
 				return null;
 			}
 		}
+		case TOKEN_ADDONE:
+			eatToken(Kind.TOKEN_ADDONE);
+			if (current.kind == Kind.TOKEN_ID) {
+				ast.exp.Id id2 = new ast.exp.Id(current.lexeme,
+						current.getLineNum());
+				autoId = current.lexeme;
+				addOrSub = 1;
+				idFirst = false;
+				eatToken(Kind.TOKEN_ID);
+				return id2;
+			} else
+				error();
+		case TOKEN_SUBONE:
+			advance();
+			if (current.kind == Kind.TOKEN_ID) {
+				ast.exp.Id id2 = new ast.exp.Id(current.lexeme,
+						current.getLineNum());
+				autoId = current.lexeme;
+				addOrSub = 2;
+				idFirst = false;
+				eatToken(Kind.TOKEN_ID);
+				return id2;
+			} else
+				error();
 		default:
 			error();
 			return null;
@@ -245,7 +290,9 @@ public class Parser {
 	// -> System.out.println ( Exp ) ;
 	// -> id = Exp ;
 	// -> id [ Exp ]= Exp ;
-
+	// -> id ++|--;
+	// -> ++|-- id;
+	// -> for(Statement)
 	boolean comeFromVarDecls = false;// define this var to judge whether this
 										// statement is after the VarDecls or
 										// not,base on it,we can distinguish the
@@ -305,6 +352,20 @@ public class Parser {
 				eatToken(Kind.TOKEN_LBRACK);
 				index = this.parseExp();
 				eatToken(Kind.TOKEN_RBRACK);
+			} else if (current.kind == Kind.TOKEN_ADDONE) {
+				autoId = id;
+				idFirst = true;
+				addOrSub = 1;
+				eatToken(Kind.TOKEN_ADDONE);
+				eatToken(Kind.TOKEN_SEMI);
+				return null;
+			} else if (current.kind == Kind.TOKEN_SUBONE) {
+				autoId = id;
+				idFirst = true;
+				addOrSub = 2;
+				eatToken(Kind.TOKEN_SUBONE);
+				eatToken(Kind.TOKEN_SEMI);
+				return null;
 			}
 			eatToken(Kind.TOKEN_ASSIGN);
 			ast.exp.T exp1 = this.parseExp();
@@ -313,6 +374,26 @@ public class Parser {
 				return new ast.stm.AssignArray(id, index, exp1);
 			else
 				return new ast.stm.Assign(id, exp1);
+		case TOKEN_ADDONE:
+			eatToken(Kind.TOKEN_ADDONE);
+			if (current.kind == Kind.TOKEN_ID) {
+				autoId = current.lexeme;
+				addOrSub = 1;
+				idFirst = false;
+			}
+			eatToken(Kind.TOKEN_ID);
+			eatToken(Kind.TOKEN_SEMI);
+			return null;
+		case TOKEN_SUBONE:
+			eatToken(Kind.TOKEN_SUBONE);
+			if (current.kind == Kind.TOKEN_ID) {
+				autoId = current.lexeme;
+				addOrSub = 2;
+				idFirst = false;
+			}
+			eatToken(Kind.TOKEN_ID);
+			eatToken(Kind.TOKEN_SEMI);
+			return null;
 		default:
 			error();
 		}
@@ -327,9 +408,43 @@ public class Parser {
 				|| current.kind == Kind.TOKEN_IF
 				|| current.kind == Kind.TOKEN_WHILE
 				|| current.kind == Kind.TOKEN_SYSTEM
-				|| current.kind == Kind.TOKEN_ID) {
+				|| current.kind == Kind.TOKEN_ID
+				|| current.kind == Kind.TOKEN_ADDONE
+				|| current.kind == Kind.TOKEN_SUBONE) {
 			ast.stm.T stm = parseStatement();
-			list.add(stm);
+
+			if ((addOrSub != 0) && (!idFirst)) {
+				if (addOrSub == 1) {
+					ast.exp.Add add = new ast.exp.Add(new ast.exp.Id(autoId),
+							new ast.exp.Num(1), current.getColNum());
+					ast.stm.Assign ass = new Assign(autoId, add);
+					list.add(ass);
+				} else if (addOrSub == 2) {
+					ast.exp.Sub sub = new ast.exp.Sub(new ast.exp.Id(autoId),
+							new ast.exp.Num(1), current.getColNum());
+					ast.stm.Assign ass = new Assign(autoId, sub);
+					list.add(ass);
+				}
+				addOrSub = 0;
+			}
+
+			if (stm != null)
+				list.add(stm);
+
+			if ((addOrSub != 0) && (idFirst)) {
+				if (addOrSub == 1) {
+					ast.exp.Add add = new ast.exp.Add(new ast.exp.Id(autoId),
+							new ast.exp.Num(1), current.getColNum());
+					ast.stm.Assign ass = new Assign(autoId, add);
+					list.add(ass);
+				} else if (addOrSub == 2) {
+					ast.exp.Sub sub = new ast.exp.Sub(new ast.exp.Id(autoId),
+							new ast.exp.Num(1), current.getColNum());
+					ast.stm.Assign ass = new Assign(autoId, sub);
+					list.add(ass);
+				}
+				addOrSub = 0;
+			}
 		}
 		return list;
 	}
@@ -385,15 +500,36 @@ public class Parser {
 	}
 
 	// VarDecl -> Type id ;
+	// -> Type id = exp;
+
+	// the "int i=10;" is seperated into two parts: "int i;" and "i=10;"
+	// the first return new Dec;the second return new Assign;
+	// the initstms contains the set of the new Assigns;
+	LinkedList<ast.stm.T> initstms;
+
 	private ast.dec.T parseVarDecl() {
 		// to parse the "Type" nonterminal in this method, instead of writing
 		// a fresh one.
+		initstms = new LinkedList<>();
+
 		ast.type.T type = parseType();
 		String id = current.lexeme;
 		int lineNum = current.getLineNum();
 		eatToken(Kind.TOKEN_ID);
+
+		// if have "="
+		ast.stm.Assign assign = null;
+		if (current.kind == Kind.TOKEN_ASSIGN) { // int i=10;
+			eatToken(Kind.TOKEN_ASSIGN);
+			ast.exp.T exp = this.parseExp();
+			assign = new ast.stm.Assign(id, exp);
+			initstms.add(assign);
+		}
 		eatToken(Kind.TOKEN_SEMI);
-		return new ast.dec.Dec(type, id, lineNum);
+
+		ast.dec.Dec dec = new Dec(type, id, lineNum);
+		dec.initial(assign);
+		return dec;
 	}
 
 	// VarDecls -> VarDecl VarDecls
@@ -445,6 +581,7 @@ public class Parser {
 
 	// Method -> public Type id ( FormalList )
 	// { VarDecl* Statement* return Exp ;}
+	// ->public Type id ( FormalList );
 	private ast.method.T parseMethod() {
 		// Lab1. Exercise 4: Fill in the missing code
 		// to parse a method.
@@ -457,14 +594,22 @@ public class Parser {
 		eatToken(Kind.TOKEN_LPAREN);
 		LinkedList<ast.dec.T> formals = this.parseFormalList();
 		eatToken(Kind.TOKEN_RPAREN);
-		eatToken(Kind.TOKEN_LBRACE);
-		LinkedList<ast.dec.T> locals = this.parseVarDecls();
-		LinkedList<ast.stm.T> stms = this.parseStatements();
-		eatToken(Kind.TOKEN_RETURN);
-		ast.exp.T retExp = this.parseExp();
-		eatToken(Kind.TOKEN_SEMI);
-		eatToken(Kind.TOKEN_RBRACE);
-		return new ast.method.Method(retType, id, formals, locals, stms, retExp);
+
+		if (current.kind == Kind.TOKEN_LBRACE) {
+			eatToken(Kind.TOKEN_LBRACE);
+			LinkedList<ast.dec.T> locals = this.parseVarDecls();
+			LinkedList<ast.stm.T> stms = this.parseStatements();
+			eatToken(Kind.TOKEN_RETURN);
+			ast.exp.T retExp = this.parseExp();
+			eatToken(Kind.TOKEN_SEMI);
+			eatToken(Kind.TOKEN_RBRACE);
+			return new ast.method.Method(retType, id, formals, locals, stms,
+					retExp);
+		} else {
+			eatToken(Kind.TOKEN_SEMI);
+			return new ast.method.Method(retType, id, formals);
+		}
+
 	}
 
 	// MethodDecls -> MethodDecl MethodDecls
@@ -478,21 +623,72 @@ public class Parser {
 		return list;
 	}
 
-	// ClassDecl -> (final)? class id { VarDecl* MethodDecl* }
-	// ->(final)? class id extends id { VarDecl* MethodDecl* }
+	// ClassDecl -> final? class id Extends Implements { VarDecl* MethodDecl* }
+	// Extends-> extends id
+	// ->
+	// Implements -> implements id InterRest*
+	// ->
+	// InterRest -> ,id
 	private ast.classs.T parseClassDecl() {
+
+		// if have 'final'
 		boolean isFinal = false;
 		if (current.kind == Kind.TOKEN_FINAL) {
 			isFinal = true;
 			advance();
 		}
+
+		// class id
 		eatToken(Kind.TOKEN_CLASS);
 		String id = current.lexeme;
 		eatToken(Kind.TOKEN_ID);
-		boolean hasExtends = false;
+
+		// if have 'extends'
 		String extendsId = null;
 		if (current.kind == Kind.TOKEN_EXTENDS) {
-			hasExtends = true;
+			eatToken(Kind.TOKEN_EXTENDS);
+			extendsId = current.lexeme;
+			eatToken(Kind.TOKEN_ID);
+		}
+
+		// if have 'implements'
+		LinkedList<String> implementIds = null;
+		if (current.kind == Kind.TOKEN_IMPLEMENTS) {
+			implementIds = new LinkedList<>();
+			eatToken(Kind.TOKEN_IMPLEMENTS);
+
+			String imple = current.lexeme;
+			implementIds.add(imple);
+			eatToken(Kind.TOKEN_ID);
+
+			while (current.kind == Kind.TOKEN_COMMER) {
+				eatToken(Kind.TOKEN_COMMER);
+				imple = current.lexeme;
+				implementIds.add(imple);
+				eatToken(Kind.TOKEN_ID);
+			}
+		}
+
+		eatToken(Kind.TOKEN_LBRACE);
+		LinkedList<ast.dec.T> decs = parseVarDecls();
+		LinkedList<ast.method.T> methods = parseMethodDecls();
+		eatToken(Kind.TOKEN_RBRACE);
+
+		ast.classs.Class t = new ast.classs.Class(id, extendsId, implementIds,
+				decs, methods);
+		t.setFinal(isFinal);
+		return t;
+	}
+
+	// InterfaceDecl ->interface id Extends { VarDecl* MethodDecl* }
+	// Extends-> extends id
+	// ->
+	private ast.classs.Interface parseInterfaceDecl() {
+		eatToken(Kind.TOKEN_INTERFACE);
+		String id = current.lexeme;
+		eatToken(Kind.TOKEN_ID);
+		String extendsId = null;
+		if (current.kind == Kind.TOKEN_EXTENDS) {
 			eatToken(Kind.TOKEN_EXTENDS);
 			extendsId = current.lexeme;
 			eatToken(Kind.TOKEN_ID);
@@ -502,26 +698,24 @@ public class Parser {
 		LinkedList<ast.method.T> methods = parseMethodDecls();
 		eatToken(Kind.TOKEN_RBRACE);
 
-		if (hasExtends) {
-			ast.classs.Class t = new ast.classs.Class(id, extendsId, decs,
-					methods);
-			t.setFinal(isFinal);
-			return t;
-		} else {
-			ast.classs.Class t = new ast.classs.Class(id, null, decs, methods);
-			t.setFinal(isFinal);
-			return t;
-		}
+		return new Interface(id, extendsId, decs, methods);
 	}
 
 	// ClassDecls -> ClassDecl ClassDecls
+	// ->InterfaceDecl ClassDecls
 	// ->
 	private LinkedList<ast.classs.T> parseClassDecls() {
 		LinkedList<ast.classs.T> classes = new LinkedList<>();
 		while (current.kind == Kind.TOKEN_CLASS
-				|| current.kind == Kind.TOKEN_FINAL) {
-			ast.classs.T clas = parseClassDecl();
-			classes.add(clas);
+				|| current.kind == Kind.TOKEN_FINAL
+				|| current.kind == Kind.TOKEN_INTERFACE) {
+			if (current.kind == Kind.TOKEN_INTERFACE) {
+				ast.classs.T interfac = parseInterfaceDecl();
+				classes.add(interfac);
+			} else {
+				ast.classs.T clas = parseClassDecl();
+				classes.add(clas);
+			}
 		}
 		return classes;
 	}

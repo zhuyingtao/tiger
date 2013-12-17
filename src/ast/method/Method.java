@@ -10,6 +10,8 @@ public class Method extends T {
 	public java.util.LinkedList<ast.stm.T> stms;
 	public ast.exp.T retExp;
 
+	public boolean isAbstract;
+
 	public Method(ast.type.T retType, String id,
 			java.util.LinkedList<ast.dec.T> formals,
 			java.util.LinkedList<ast.dec.T> locals,
@@ -20,7 +22,14 @@ public class Method extends T {
 		this.locals = locals;
 		this.stms = stms;
 		this.retExp = retExp;
+	}
 
+	public Method(ast.type.T retType, String id,
+			java.util.LinkedList<ast.dec.T> formals) {
+		this.retType = retType;
+		this.id = id;
+		this.formals = formals;
+		this.isAbstract = true;
 	}
 
 	@Override

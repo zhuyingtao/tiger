@@ -3,6 +3,7 @@ package codegen.bytecode;
 import java.util.Hashtable;
 import java.util.LinkedList;
 
+import ast.classs.Interface;
 import util.Label;
 
 // Given a Java ast, translate it into Java bytecode.
@@ -396,5 +397,11 @@ public class TranslateVisitor implements ast.Visitor {
 		this.program = new codegen.bytecode.program.Program(this.mainClass,
 				newClasses);
 		return;
+	}
+
+	@Override
+	public void visit(Interface i) {
+		// TODO Auto-generated method stub
+		
 	}
 }

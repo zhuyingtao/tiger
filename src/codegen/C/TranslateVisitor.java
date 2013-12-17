@@ -1,5 +1,7 @@
 package codegen.C;
 
+import ast.classs.Interface;
+
 // Given a Java ast, translate it into a C ast and outputs it.
 
 public class TranslateVisitor implements ast.Visitor {
@@ -419,5 +421,11 @@ public class TranslateVisitor implements ast.Visitor {
 		this.program = new codegen.C.program.Program(this.classes,
 				this.vtables, this.methods, this.mainMethod);
 		return;
+	}
+
+	@Override
+	public void visit(Interface i) {
+		// TODO Auto-generated method stub
+		
 	}
 }

@@ -47,6 +47,7 @@ public class MethodTable {
 				System.exit(1);
 			}
 			this.table.put(decc.id, decc.type);
+			decc.idRef.hasInitial = true;
 			this.table2.put(decc.id, decc.idRef);
 			// the parameter don't need to check isUsed
 			this.formalTable.add(decc.id);
