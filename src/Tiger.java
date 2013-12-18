@@ -23,7 +23,7 @@ public class Tiger {
 		// CommandLine cmd = new CommandLine();
 		// String fname = cmd.scan(args);
 
-		String fname = "test/javaSrc/NewTest/TestFor.java";
+		String fname = "test/javaSrc/BubbleSort.java";
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
@@ -158,15 +158,17 @@ public class Tiger {
 		} else if (control.Control.codegen == Codegen_Kind_t.Bytecode) {
 			try {
 				for (int i = 0; i < ppbc.jNames.size(); i++) {
-					run.exec("java -jar jasmin.jar " + ppbc.jNames.get(i)
-							+ " -d test/bytecodeTest");
+					process = run.exec("java -jar jasmin.jar "
+							+ ppbc.jNames.get(i) + " -d test/bytecodeTest");
 				}
+				process.waitFor();
 				// fileName now is '*.java';
 				// the regex . can present any character,so use "\\."
 				String main = Control.fileName.split("\\.")[0];
 				// Here you cannot write the command like this:
 				// "java test/bytecodeTest/%main% " and I don't know why;
 				process = run.exec("java -classpath test/bytecodeTest " + main);
+
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
