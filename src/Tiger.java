@@ -18,7 +18,7 @@ public class Tiger {
 	public ast.program.T theAst;
 
 	// lex and parse
-	private void lexAndParse(String fname) {
+	public void lexAndParse(String fname) {
 		Parser parser;
 		try {
 			fstream = new BufferedInputStream(new FileInputStream(fname));
@@ -35,15 +35,16 @@ public class Tiger {
 	}
 
 	public void compile(String fname) {
-
+		System.out.println("--------enter compile ");
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
 		if (control.Control.testFac) {
+			System.out.println("-------enter testFac");
+
 			ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
 			control.CompilerPass ppPass = new control.CompilerPass(
 					"Pretty printing AST", ast.Fac.prog, pp);
-			// ppPass.doit();
-
+			ppPass.doit();
 			// elaborate the given program, this step is necessary
 			// for that it will annotate the AST with some
 			// informations used by later phase.
@@ -139,9 +140,7 @@ public class Tiger {
 			cmd.usage();
 			return;
 		}
-
 		Control.fileName = fname.substring(fname.lastIndexOf("/") + 1);
-
 		// /////////////////////////////////////////////////////
 		// it would be helpful to be able to test the lexer
 		// independently.
@@ -181,11 +180,11 @@ public class Tiger {
 		elabAstPass.doit();
 
 		// optimize the AST
-		ast.optimizations.Main optAstPasses = new ast.optimizations.Main();
+		ast.optimizations.Main optAST = new ast.optimizations.Main();
 		control.CompilerPass optAstPass = new control.CompilerPass(
-				"Optimizing the AST", optAstPasses, theAst);
-		optAstPass.doitName("doit");
-		theAst = optAstPasses.program;
+				"Optimizing the AST", optAST, theAst);
+		optAstPass.doit();
+		theAst = optAST.program;
 
 		codegen.bytecode.PrettyPrintVisitor ppbc = null;
 		codegen.C.PrettyPrintVisitor ppc = null;
@@ -267,13 +266,17 @@ public class Tiger {
 
 	public void assemble(String str) {
 		// Your code here:
+		System.out.println("-------enter assemble");
 	}
 
 	public void link(String str) {
 		// Your code here:
+		System.out.println("-------enter link");
 	}
 
 	public void compileAndLink(String fname) {
+		System.out.println("-------enter compileAndlink");
+
 		// compile
 		control.CompilerPass compilePass = new control.CompilerPass("Compile",
 				tiger, fname);
@@ -299,7 +302,8 @@ public class Tiger {
 		cmd = new CommandLine();
 		String fname = "";
 		fname = cmd.scan(args);
-
+		// fname="test/DeadClass.java";
+		// Control.trace.add("ast.DeadClass");
 		control.CompilerPass tigerAll = new control.CompilerPass("Tiger",
 				tiger, fname);
 		tigerAll.doitName("compileAndLink");

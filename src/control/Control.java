@@ -52,7 +52,7 @@ public class Control {
 		trace.add(name);
 		return;
 	}
-
+	
 	public static boolean isTracing(String name) {
 		for (String s : trace) {
 			if (s.equals(name))

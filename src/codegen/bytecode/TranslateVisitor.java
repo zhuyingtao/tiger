@@ -322,6 +322,7 @@ public class TranslateVisitor implements ast.Visitor {
 		this.index = 1;
 		this.indexTable = new java.util.Hashtable<String, Integer>();
 
+		this.stms = new java.util.LinkedList<codegen.bytecode.stm.T>();
 		m.retType.accept(this);
 		codegen.bytecode.type.T newRetType = this.type;
 		java.util.LinkedList<codegen.bytecode.dec.T> newFormals = new java.util.LinkedList<codegen.bytecode.dec.T>();
@@ -334,7 +335,7 @@ public class TranslateVisitor implements ast.Visitor {
 			d.accept(this);
 			newLocals.add(this.dec);
 		}
-		this.stms = new java.util.LinkedList<codegen.bytecode.stm.T>();
+
 		for (ast.stm.T s : m.stms) {
 			s.accept(this);
 		}
