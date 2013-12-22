@@ -39,6 +39,10 @@ public class TranslateVisitor implements ast.Visitor {
 	// expressions
 	@Override
 	public void visit(ast.exp.Add e) {
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		e.left.accept(this);
 		e.right.accept(this);
 		emit(new codegen.bytecode.stm.Iadd());
@@ -46,6 +50,10 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.And e) {
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		e.left.accept(this);
 		e.right.accept(this);
 		emit(new codegen.bytecode.stm.Iand());

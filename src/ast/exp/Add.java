@@ -3,7 +3,8 @@ package ast.exp;
 public class Add extends T {
 	public T left;
 	public T right;
-
+	
+	public T result;
 
 	public Add(T left, T right) {
 		this.left = left;

@@ -4,6 +4,7 @@ public class And extends T {
 	public T left;
 	public T right;
 	
+	public T result;
 
 	public And(T left, T right) {
 		this.left = left;

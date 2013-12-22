@@ -1,8 +1,15 @@
 package ast.type;
 
-public abstract class T implements ast.Acceptable
+import java.io.Serializable;
+
+public abstract class T implements ast.Acceptable,Serializable
 {
-  // boolean: -1
+  /**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
+
+// boolean: -1
   // int: 0
   // int[]: 1
   // class: 2

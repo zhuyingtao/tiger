@@ -32,27 +32,33 @@ public class TranslateVisitor implements ast.Visitor {
 		this.program = null;
 	}
 
-
 	// //////////////////////////////////////////////////////
 	//
 	public String genId() {
 		return util.Temp.next();
 	}
 
-
 	// /////////////////////////////////////////////////////
 	// expressions
 	@Override
 	public void visit(ast.exp.Add e) {
-		e.left.accept(this);
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		codegen.C.exp.T left = this.exp;
-		e.right.accept(this);
+		if (e.right != null)
+			e.right.accept(this);
 		codegen.C.exp.T right = this.exp;
 		this.exp = new codegen.C.exp.Add(left, right);
 	}
 
 	@Override
 	public void visit(ast.exp.And e) {
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		e.left.accept(this);
 		codegen.C.exp.T left = this.exp;
 		e.right.accept(this);
@@ -68,7 +74,6 @@ public class TranslateVisitor implements ast.Visitor {
 		codegen.C.exp.T array = this.exp;
 		this.exp = new codegen.C.exp.ArraySelect(array, index);
 	}
-
 
 	@Override
 	public void visit(ast.exp.Call e) {
@@ -89,7 +94,6 @@ public class TranslateVisitor implements ast.Visitor {
 		this.exp = new codegen.C.exp.Call(newid, exp, e.id, args, retType);
 		return;
 	}
-
 
 	@Override
 	// in C,0 is false.
@@ -115,6 +119,10 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Lt e) {
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		e.left.accept(this);
 		codegen.C.exp.T left = this.exp;
 		e.right.accept(this);
@@ -138,6 +146,10 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Not e) {
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		e.exp.accept(this);
 		codegen.C.exp.T exp = this.exp;
 		this.exp = new codegen.C.exp.Not(exp);
@@ -151,9 +163,13 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Sub e) {
-		e.left.accept(this);
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		codegen.C.exp.T left = this.exp;
-		e.right.accept(this);
+		if (e.right != null)
+			e.right.accept(this);
 		codegen.C.exp.T right = this.exp;
 		this.exp = new codegen.C.exp.Sub(left, right);
 		return;
@@ -167,11 +183,17 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Times e) {
-		e.left.accept(this);
+		if (e.result != null) {
+			e.result.accept(this);
+			return;
+		}
 		codegen.C.exp.T left = this.exp;
-		e.right.accept(this);
+		if (e.right != null)
+			e.right.accept(this);
 		codegen.C.exp.T right = this.exp;
 		this.exp = new codegen.C.exp.Times(left, right);
+		if (e.right == null && e.left == null)
+			this.exp = new codegen.C.exp.Num(0);
 		return;
 	}
 
@@ -211,11 +233,14 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.If s) {
-		s.condition.accept(this);
+		if (s.condition != null)
+			s.condition.accept(this);
 		codegen.C.exp.T condition = this.exp;
-		s.thenn.accept(this);
+		if (s.thenn != null)
+			s.thenn.accept(this);
 		codegen.C.stm.T thenn = this.stm;
-		s.elsee.accept(this);
+		if (s.elsee != null)
+			s.elsee.accept(this);
 		codegen.C.stm.T elsee = this.stm;
 		this.stm = new codegen.C.stm.If(condition, thenn, elsee);
 		return;
@@ -230,9 +255,11 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.While s) {
-		s.condition.accept(this);
+		if (s.condition != null)
+			s.condition.accept(this);
 		codegen.C.exp.T condition = this.exp;
-		s.body.accept(this);
+		if (s.body != null)
+			s.body.accept(this);
 		codegen.C.stm.T body = this.stm;
 		this.stm = new codegen.C.stm.While(condition, body);
 	}
@@ -426,4 +453,5 @@ public class TranslateVisitor implements ast.Visitor {
 				this.vtables, this.methods, this.mainMethod);
 		return;
 	}
+
 }

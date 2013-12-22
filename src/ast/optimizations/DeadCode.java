@@ -1,13 +1,11 @@
 package ast.optimizations;
 
-import ast.program.Program;
-
 // Dead code elimination optimizations on an AST.
 
 public class DeadCode implements ast.Visitor {
-	private ast.classs.T newClass;
-	private ast.mainClass.T mainClass;
-	public ast.program.T program;
+	public ast.classs.T newClass;
+	public ast.mainClass.T mainClass;
+	public ast.program.Program program;
 
 	public DeadCode() {
 		this.newClass = null;
@@ -25,14 +23,17 @@ public class DeadCode implements ast.Visitor {
 	// expressions
 	@Override
 	public void visit(ast.exp.Add e) {
+		return;
 	}
 
 	@Override
 	public void visit(ast.exp.And e) {
+		return;
 	}
 
 	@Override
 	public void visit(ast.exp.ArraySelect e) {
+		return;
 	}
 
 	@Override
@@ -42,6 +43,7 @@ public class DeadCode implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.False e) {
+		return;
 	}
 
 	@Override
@@ -51,6 +53,7 @@ public class DeadCode implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Length e) {
+		return;
 	}
 
 	@Override
@@ -60,6 +63,7 @@ public class DeadCode implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.NewIntArray e) {
+		return;
 	}
 
 	@Override
@@ -88,7 +92,6 @@ public class DeadCode implements ast.Visitor {
 
 	@Override
 	public void visit(ast.exp.Times e) {
-
 		return;
 	}
 
@@ -99,22 +102,31 @@ public class DeadCode implements ast.Visitor {
 	// statements
 	@Override
 	public void visit(ast.stm.Assign s) {
-
 		return;
 	}
 
 	@Override
 	public void visit(ast.stm.AssignArray s) {
+		return;
 	}
 
 	@Override
 	public void visit(ast.stm.Block s) {
+		for (ast.stm.T stm : s.stms) {
+			stm.accept(this);
+		}
 	}
 
 	@Override
 	public void visit(ast.stm.If s) {
+		if (s.condition.result != null)
+			s.condition = s.condition.result;
 		if (s.condition instanceof ast.exp.True) {
-
+			s.condition = null;
+			s.elsee = null;
+		} else if (s.condition instanceof ast.exp.False) {
+			s.condition = null;
+			s.thenn = null;
 		}
 		return;
 	}
@@ -126,6 +138,12 @@ public class DeadCode implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.While s) {
+		if (s.condition.result != null)
+			s.condition = s.condition.result;
+		if (s.condition instanceof ast.exp.False) {
+			s.condition = null;
+			s.body = null;
+		}
 	}
 
 	// type
@@ -154,20 +172,29 @@ public class DeadCode implements ast.Visitor {
 	// method
 	@Override
 	public void visit(ast.method.Method m) {
+		for (ast.stm.T stm : m.stms) {
+			stm.accept(this);
+		}
 		return;
 	}
 
 	// class
 	@Override
 	public void visit(ast.classs.Class c) {
+		for (ast.dec.T dec : c.decs) {
+			dec.accept(this);
+		}
 
+		for (ast.method.T method : c.methods) {
+			method.accept(this);
+		}
 		return;
 	}
 
 	// main class
 	@Override
 	public void visit(ast.mainClass.MainClass c) {
-
+		c.stm.accept(this);
 		return;
 	}
 
@@ -176,8 +203,13 @@ public class DeadCode implements ast.Visitor {
 	public void visit(ast.program.Program p) {
 
 		// You should comment out this line of code:
-		this.program = p;
-		this.program = new Program(p.mainClass, p.classes);
+		// this.program = p;
+
+		this.program = (ast.program.Program) (p.copy());
+		this.program.mainClass.accept(this);
+		for (ast.classs.T classs : this.program.classes) {
+			classs.accept(this);
+		}
 
 		if (control.Control.trace.contains("ast.DeadCode")) {
 			System.out
@@ -187,6 +219,7 @@ public class DeadCode implements ast.Visitor {
 			p.accept(pp);
 			System.out.println("after optimization:");
 			this.program.accept(pp);
+			System.out.println("==============End============");
 		}
 		return;
 	}

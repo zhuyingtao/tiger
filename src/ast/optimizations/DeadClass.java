@@ -39,8 +39,10 @@ public class DeadClass implements ast.Visitor {
 	@Override
 	public void visit(ast.exp.Call e) {
 		e.exp.accept(this);
-		for (ast.exp.T arg : e.args) {
-			arg.accept(this);
+		if (e.args != null) {
+			for (ast.exp.T arg : e.args) {
+				arg.accept(this);
+			}
 		}
 		return;
 	}
@@ -250,7 +252,8 @@ public class DeadClass implements ast.Visitor {
 		this.program = new ast.program.Program(p.mainClass, newClasses);
 		// System.out.println(control.Control.trace);
 		if (control.Control.trace.contains("ast.DeadClass")) {
-			System.out.println("==============Dead Class Elimination============");
+			System.out
+					.println("==============Dead Class Elimination============");
 			System.out.println("before optimization:");
 			ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
 			p.accept(pp);
