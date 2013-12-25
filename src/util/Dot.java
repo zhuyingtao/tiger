@@ -8,156 +8,155 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.LinkedList;
 
-public class Dot
-{
-  class DotElement<X, Y, Z>
-  {
-    Triple<X, Y, Z> e;
+import control.Control;
 
-    public DotElement(X x, Y y, Z z)
-    {
-      this.e = new Triple<X, Y, Z>(x, y, z);
-    }
+public class Dot {
+	class DotElement<X, Y, Z> {
+		Triple<X, Y, Z> e;
 
-    public String toString()
-    {
-      String s = "";
-      if (this.e.z != null)
-        s = this.e.z.toString();
+		public DotElement(X x, Y y, Z z) {
+			this.e = new Triple<X, Y, Z>(x, y, z);
+		}
 
-      return ("\"" + e.x.toString() + "\"" + "->" + "\"" + e.y.toString()
-          + "\"" + s + ";\n");
-    }
-  }
+		public String toString() {
+			String s = "";
+			if (this.e.z != null)
+				s = this.e.z.toString();
 
-  LinkedList<DotElement<String, String, String>> list;
+			return ("\"" + e.x.toString() + "\"" + "->" + "\"" + e.y.toString()
+					+ "\"" + s + ";\n");
+		}
+	}
 
-  public Dot()
-  {
-    this.list = new LinkedList<DotElement<String, String, String>>();
-  }
+	LinkedList<DotElement<String, String, String>> list;
 
-  public void insert(String from, String to)
-  {
-    this.list.addFirst(new DotElement<String, String, String>(from, to, null));
-  }
+	public Dot() {
+		this.list = new LinkedList<DotElement<String, String, String>>();
+	}
 
-  public void insert(String from, String to, String info)
-  {
+	public void insert(String from, String to) {
+		this.list.addFirst(new DotElement<String, String, String>(from, to,
+				null));
+	}
 
-    String s = "[label=\"" + info + "\"]";
-    // System.out.println(s);
-    this.list.addFirst(new DotElement<String, String, String>(from, to, s));
-  }
+	public void insert(String from, String to, String info) {
 
-  public String toString()
-  {
-    StringBuffer sb = new StringBuffer();
+		String s = "[label=\"" + info + "\"]";
+		// System.out.println(s);
+		this.list.addFirst(new DotElement<String, String, String>(from, to, s));
+	}
 
-    for (DotElement<String, String, String> e : this.list) {
-      sb.append(e.toString());
-    }
+	public String toString() {
+		StringBuffer sb = new StringBuffer();
 
-    String result = sb.toString();
+		for (DotElement<String, String, String> e : this.list) {
+			sb.append(e.toString());
+		}
 
-    return result;
-  }
+		String result = sb.toString();
 
-  public void toDot(String fname)
-  {
-    String fn = fname + ".dot";
-    try {
-      File f = new File(fn);
-      FileWriter fw = new FileWriter(f);
-      BufferedWriter w = new BufferedWriter(fw);
+		return result;
+	}
 
-      StringBuffer sb = new StringBuffer();
-      sb.append("digraph g{\n");
-      sb.append("\tsize = \"10, 10\";\n");
-      sb.append("\tnode [color=lightblue2, style=filled];\n");
+	public void toDot(String fname) {
+		String fn = fname + ".dot";
+		try {
+			File f = new File(fn);
+			FileWriter fw = new FileWriter(f);
+			BufferedWriter w = new BufferedWriter(fw);
 
-      sb.append(this.toString());
+			StringBuffer sb = new StringBuffer();
+			sb.append("digraph g{\n");
+			sb.append("\tsize = \"10, 10\";\n");
+			sb.append("\tnode [color=lightblue2, style=filled];\n");
 
-      sb.append("}\n");
+			sb.append(this.toString());
 
-      w.write(sb.toString());
-      w.close();
-      fw.close();
-    } catch (Throwable o) {
-      new util.Error();
-    }
-    return;
-  }
+			sb.append("}\n");
 
-  void visualize(String name)
-  {
-    toDot(name);
-    String format = "";
-    String postfix = "";
-    switch (control.Control.visualize) {
-    case Bmp:
-      format = "-Tbmp";
-      postfix = "bmp";
-      break;
-    case Pdf:
-      format = "-Tpdf";
-      postfix = "pdf";
-      break;
-    case Ps:
-      format = "-Tps";
-      postfix = "ps";
-      break;
-    case Jpg:
-      format = "-Tjpg";
-      postfix = "jpg";
-      break;
-    default:
-      new util.Error();
-      break;
-    }
-    String[] args = { "dot", format, name + ".dot", "-o", name + "." + postfix };
-    try {
-      // Read this article:
-      // http://walsh.iteye.com/blog/449051
-      final class StreamDrainer implements Runnable
-      {
-        private InputStream ins;
+			w.write(sb.toString());
+			w.close();
+			fw.close();
+		} catch (Throwable o) {
+			new util.Error();
+		}
+		return;
+	}
 
-        public StreamDrainer(InputStream ins)
-        {
-          this.ins = ins;
-        }
+	void visualize(String name) {
+		toDot(name);
+		String format = "";
+		String postfix = "";
+		switch (control.Control.visualize) {
+		case Bmp:
+			format = "-Tbmp";
+			postfix = "bmp";
+			break;
+		case Pdf:
+			format = "-Tpdf";
+			postfix = "pdf";
+			break;
+		case Ps:
+			format = "-Tps";
+			postfix = "ps";
+			break;
+		case Jpg:
+			format = "-Tjpg";
+			postfix = "jpg";
+			break;
+		default:
+			new util.Error();
+			break;
+		}
 
-        public void run()
-        {
-          try {
-            BufferedReader reader = new BufferedReader(new InputStreamReader(
-                ins));
-            String line = null;
-            while ((line = reader.readLine()) != null) {
-              System.out.println(line);
-            }
-          } catch (Exception e) {
-            e.printStackTrace();
-          }
-        }
+		String temp = Control.fileName.split("\\.")[0];
+		File file = new File("graph/" + temp);
+		file.mkdirs();
 
-      }
-      Process process = Runtime.getRuntime().exec(args);
-      new Thread(new StreamDrainer(process.getInputStream())).start();
-      new Thread(new StreamDrainer(process.getErrorStream())).start();
-      process.getOutputStream().close();
-      @SuppressWarnings("unused")
-	int exitValue = process.waitFor();
-      if (!control.Control.dumpDot) {
-        if (new File(name + ".dot").delete())
-          ;
-        else
-          throw new Throwable();
-      }
-    } catch (Throwable o) {
-      o.printStackTrace();
-    }
-    return;
-  }
+		String[] args = { "dot", format, name + ".dot", "-o",
+				file.getPath() + "/" + name + "." + postfix };
+		try {
+			// Read this article:
+			// http://walsh.iteye.com/blog/449051
+			final class StreamDrainer implements Runnable {
+				private InputStream ins;
+
+				public StreamDrainer(InputStream ins) {
+					this.ins = ins;
+				}
+
+				public void run() {
+					try {
+						BufferedReader reader = new BufferedReader(
+								new InputStreamReader(ins));
+						String line = null;
+						while ((line = reader.readLine()) != null) {
+							System.out.println(line);
+						}
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+
+			}
+			// for (String string : args) {
+			// System.out.println(string);
+			// }
+			Process process = Runtime.getRuntime().exec(args);
+			new Thread(new StreamDrainer(process.getInputStream())).start();
+			new Thread(new StreamDrainer(process.getErrorStream())).start();
+			process.getOutputStream().close();
+			@SuppressWarnings("unused")
+			int exitValue = process.waitFor();
+			if (!control.Control.dumpDot) {
+				if (new File(name + ".dot").delete())
+					;
+				else
+					throw new Throwable();
+			}
+		} catch (Throwable o) {
+			o.printStackTrace();
+		}
+		return;
+	}
 }

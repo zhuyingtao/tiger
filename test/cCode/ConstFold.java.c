@@ -61,12 +61,7 @@ int Doit_doit(struct Doit * this)
   int x;
 
   x = 999;
-  if (999){
     System_out_println (1);
-
-  }else{
-    System_out_println (1);
-  }
   prev=frame.prev;
   return 0;
 }

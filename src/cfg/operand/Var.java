@@ -2,18 +2,21 @@ package cfg.operand;
 
 import cfg.Visitor;
 
-public class Var extends T
-{
-  public String id;
+public class Var extends T {
+	public String id;
+	public boolean isField;
 
-  public Var(String id)
-  {
-    this.id = id;
-  }
+	public Var(String id) {
+		this.id = id;
+	}
 
-  @Override
-  public void accept(Visitor v)
-  {
-    v.visit(this);
-  }
+	public Var(String id, boolean isField) {
+		this.id = id;
+		this.isField = isField;
+	}
+
+	@Override
+	public void accept(Visitor v) {
+		v.visit(this);
+	}
 }

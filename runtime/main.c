@@ -23,6 +23,6 @@ int main(int argc, char **argv) {
 	// enter Java code...
 	Tiger_main();
 
-	printf("The file log.txt in this directory "
-			"contains the information about GC");
+//	printf("The file log.txt in this directory "
+//			"contains the information about GC");
 }

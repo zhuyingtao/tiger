@@ -4,8 +4,8 @@ public class Main {
 	public ast.program.T program;
 
 	public void accept(ast.program.T ast) {
-		for (int i = 0; i < 2; i++) {
-
+		for (int i = 0; i < 2; i++) { // do the opt AST twice;
+			System.out.println("********* "+(i+1)+" round optimization ************");
 			DeadClass dceVisitor = new DeadClass();
 			control.CompilerPass deadClassPass = new control.CompilerPass(
 					"Dead class elimination", ast, dceVisitor);

@@ -46,6 +46,8 @@ public class TranslateVisitor implements ast.Visitor {
 			e.result.accept(this);
 			return;
 		}
+		if (e.left != null)
+			e.left.accept(this);
 		codegen.C.exp.T left = this.exp;
 		if (e.right != null)
 			e.right.accept(this);
@@ -167,6 +169,8 @@ public class TranslateVisitor implements ast.Visitor {
 			e.result.accept(this);
 			return;
 		}
+		if (e.left != null)
+			e.left.accept(this);
 		codegen.C.exp.T left = this.exp;
 		if (e.right != null)
 			e.right.accept(this);
@@ -187,6 +191,8 @@ public class TranslateVisitor implements ast.Visitor {
 			e.result.accept(this);
 			return;
 		}
+		if (e.left != null)
+			e.left.accept(this);
 		codegen.C.exp.T left = this.exp;
 		if (e.right != null)
 			e.right.accept(this);
@@ -233,15 +239,21 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.If s) {
-		if (s.condition != null)
+		codegen.C.exp.T condition = null;
+		codegen.C.stm.T thenn = null;
+		codegen.C.stm.T elsee = null;
+		if (s.condition != null) {
 			s.condition.accept(this);
-		codegen.C.exp.T condition = this.exp;
-		if (s.thenn != null)
+			condition = this.exp;
+		}
+		if (s.thenn != null) {
 			s.thenn.accept(this);
-		codegen.C.stm.T thenn = this.stm;
-		if (s.elsee != null)
+			thenn = this.stm;
+		}
+		if (s.elsee != null) {
 			s.elsee.accept(this);
-		codegen.C.stm.T elsee = this.stm;
+			elsee = this.stm;
+		}
 		this.stm = new codegen.C.stm.If(condition, thenn, elsee);
 		return;
 	}
@@ -255,12 +267,16 @@ public class TranslateVisitor implements ast.Visitor {
 
 	@Override
 	public void visit(ast.stm.While s) {
-		if (s.condition != null)
+		codegen.C.exp.T condition = null;
+		codegen.C.stm.T body = null;
+		if (s.condition != null) {
 			s.condition.accept(this);
-		codegen.C.exp.T condition = this.exp;
-		if (s.body != null)
+			condition = this.exp;
+		}
+		if (s.body != null) {
 			s.body.accept(this);
-		codegen.C.stm.T body = this.stm;
+			body = this.stm;
+		}
 		this.stm = new codegen.C.stm.While(condition, body);
 	}
 

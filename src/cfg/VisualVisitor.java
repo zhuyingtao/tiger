@@ -1,5 +1,12 @@
 package cfg;
 
+import cfg.stm.And;
+import cfg.stm.ArraySelect;
+import cfg.stm.Length;
+import cfg.stm.MoveArray;
+import cfg.stm.NewIntArray;
+import cfg.stm.Not;
+
 public class VisualVisitor implements Visitor {
 	public StringBuffer strb;
 
@@ -32,7 +39,7 @@ public class VisualVisitor implements Visitor {
 		s.left.accept(this);
 		emit(" + ");
 		s.right.accept(this);
-		emit(";");
+		emit(";\n");
 		return;
 	}
 
@@ -44,7 +51,7 @@ public class VisualVisitor implements Visitor {
 			emit(", ");
 			x.accept(this);
 		}
-		emit(");");
+		emit(");\n");
 		return;
 	}
 
@@ -54,7 +61,7 @@ public class VisualVisitor implements Visitor {
 		s.left.accept(this);
 		emit(" < ");
 		s.right.accept(this);
-		emit(";");
+		emit(";\n");
 		return;
 	}
 
@@ -62,14 +69,14 @@ public class VisualVisitor implements Visitor {
 	public void visit(cfg.stm.Move s) {
 		emit(s.dst + " = ");
 		s.src.accept(this);
-		emit(";");
+		emit(";\n");
 		return;
 	}
 
 	@Override
 	public void visit(cfg.stm.NewObject s) {
 		emit(s.dst + " = ((struct " + s.c + "*)(Tiger_new (&" + s.c
-				+ "_vtable_, sizeof(struct " + s.c + "))));");
+				+ "_vtable_, sizeof(struct " + s.c + "))));\n");
 		return;
 	}
 
@@ -77,7 +84,7 @@ public class VisualVisitor implements Visitor {
 	public void visit(cfg.stm.Print s) {
 		emit("System_out_println (");
 		s.arg.accept(this);
-		emit(");");
+		emit(");\n");
 		return;
 	}
 
@@ -87,7 +94,7 @@ public class VisualVisitor implements Visitor {
 		s.left.accept(this);
 		emit(" - ");
 		s.right.accept(this);
-		emit(";");
+		emit(";\n");
 		return;
 	}
 
@@ -97,7 +104,7 @@ public class VisualVisitor implements Visitor {
 		s.left.accept(this);
 		emit(" * ");
 		s.right.accept(this);
-		emit(";");
+		emit(";\n");
 		return;
 	}
 
@@ -121,7 +128,9 @@ public class VisualVisitor implements Visitor {
 
 	@Override
 	public void visit(cfg.transfer.Return s) {
-
+		emit("return ");
+		s.operand.accept(this);
+		emit(";\n");
 		return;
 	}
 
@@ -148,7 +157,11 @@ public class VisualVisitor implements Visitor {
 	// dec
 	@Override
 	public void visit(cfg.block.Block b) {
-
+		emit(b.label.toString() + ":\\n");
+		for (cfg.stm.T stm : b.stms) {
+			stm.accept(this);
+		}
+		b.transfer.accept(this);
 		return;
 	}
 
@@ -242,4 +255,64 @@ public class VisualVisitor implements Visitor {
 		p.mainMethod.accept(this);
 	}
 
+	@Override
+	public void visit(And s) {
+		// TODO Auto-generated method stub
+		emit(s.dst + " = ");
+		s.left.accept(this);
+		emit(" && ");
+		s.right.accept(this);
+		emit(";\n");
+		return;
+
+	}
+
+	@Override
+	public void visit(ArraySelect s) {
+		// TODO Auto-generated method stub
+		emit(s.dst + " = ");
+		s.array.accept(this);
+		emit("[");
+		s.index.accept(this);
+		emit("];\n");
+
+	}
+
+	@Override
+	public void visit(Length s) {
+		// TODO Auto-generated method stub
+		emit(s.dst + " = ");
+		emit("Length(");
+		s.array.accept(this);
+		emit(");\n");
+		return;
+	}
+
+	@Override
+	public void visit(NewIntArray s) {
+		// TODO Auto-generated method stub
+		emit(s.dst + " = ");
+		emit("(int *)Tiger_new_array(");
+		s.exp.accept(this);
+		emit(");\n");
+	}
+
+	@Override
+	public void visit(Not s) {
+		// TODO Auto-generated method stub
+		emit(s.dst + " = ");
+		emit("!(");
+		s.exp.accept(this);
+		emit(");\n");
+	}
+
+	@Override
+	public void visit(MoveArray s) {
+		// TODO Auto-generated method stub
+		emit(s.dst + "[");
+		s.index.accept(this);
+		emit("] = ");
+		s.exp.accept(this);
+		emit(";\n");
+	}
 }

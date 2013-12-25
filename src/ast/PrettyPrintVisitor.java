@@ -142,8 +142,9 @@ public class PrettyPrintVisitor implements Visitor {
 			e.result.accept(this);
 			return;
 		}
-		this.say("!");
+		this.say("!(");
 		e.exp.accept(this);
+		this.say(")");
 	}
 
 	@Override

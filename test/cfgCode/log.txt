@@ -1,0 +1,70 @@
+The Java Heap init info :
+----the heapSize : 1024
+----the 'from' pointer : 0x00350C70
+----the 'fromFree' pointer : 0x00350C70
+----the 'to' pointer : 0x00350E70
+
+
+The new object info :
+----the rest size of Heap : 512
+----the needed size of this object : 4
+----the 'vptr' pointer : 0x00406000
+----the 'fromFree' pointer : 0x00350C74
+
+
+The new object info :
+----the rest size of Heap : 508
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350C90
+
+
+The new object info :
+----the rest size of Heap : 480
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350CAC
+
+
+The new object info :
+----the rest size of Heap : 452
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350CC8
+
+
+The new object info :
+----the rest size of Heap : 424
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350CE4
+
+
+The new object info :
+----the rest size of Heap : 396
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350D00
+
+
+The new object info :
+----the rest size of Heap : 368
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350D1C
+
+
+The new object info :
+----the rest size of Heap : 340
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350D38
+
+
+The new object info :
+----the rest size of Heap : 312
+----the needed size of this object : 28
+----the 'vptr' pointer : 0x00406020
+----the 'fromFree' pointer : 0x00350D54
+
+

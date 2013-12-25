@@ -215,21 +215,27 @@ public class PrettyPrintVisitor implements Visitor {
 	@Override
 	public void visit(codegen.C.stm.If s) {
 		this.printSpaces();
-		this.say("if (");
-		s.condition.accept(this);
-		this.sayln("){");
-		this.indent();
-		s.thenn.accept(this);
-		this.unIndent();
-		this.sayln("");
-		this.printSpaces();
-		this.sayln("}else{");
-		this.indent();
-		s.elsee.accept(this);
+		if (s.condition != null) {
+			this.say("if (");
+			s.condition.accept(this);
+			this.sayln("){");
+			this.indent();
+		}
+		if (s.thenn != null) {
+			s.thenn.accept(this);
+		}
+		if (s.elsee != null) {
+			this.unIndent();
+			this.sayln("");
+			this.printSpaces();
+			this.sayln("}else{");
+			this.indent();
+			s.elsee.accept(this);
 
-		this.unIndent();
-		this.printSpaces();
-		this.sayln("}");
+			this.unIndent();
+			this.printSpaces();
+			this.sayln("}");
+		}
 		return;
 	}
 
@@ -244,20 +250,22 @@ public class PrettyPrintVisitor implements Visitor {
 
 	@Override
 	public void visit(codegen.C.stm.While s) {
-		this.printSpaces();
-		this.say("while (");
-		s.condition.accept(this);
-		this.sayln(")");
+		if (s.condition != null) {
+			this.printSpaces();
+			this.say("while (");
+			s.condition.accept(this);
+			this.sayln(")");
 
-		this.printSpaces();
-		this.sayln("{");
+			this.printSpaces();
+			this.sayln("{");
 
-		this.indent();
-		s.body.accept(this);
-		this.unIndent();
+			this.indent();
+			s.body.accept(this);
+			this.unIndent();
 
-		this.printSpaces();
-		this.sayln("}");
+			this.printSpaces();
+			this.sayln("}");
+		}
 	}
 
 	// type
@@ -466,9 +474,9 @@ public class PrettyPrintVisitor implements Visitor {
 			if (Control.outputName != null)
 				outputName = Control.outputName;
 			else if (Control.fileName != null)
-				outputName = "test/ccodeTest/" + Control.fileName + ".c";
+				outputName = "test/cCode/" + Control.fileName + ".c";
 			else
-				outputName = "a.c";
+				outputName = "a.c.c";
 
 			this.writer = new java.io.BufferedWriter(
 					new java.io.OutputStreamWriter(

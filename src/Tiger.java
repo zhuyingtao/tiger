@@ -1,6 +1,5 @@
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import lexer.Lexer;
@@ -9,7 +8,6 @@ import lexer.Token.Kind;
 import parser.Parser;
 import control.CommandLine;
 import control.Control;
-import control.Control.Codegen_Kind_t;
 
 public class Tiger {
 	static Tiger tiger;
@@ -35,9 +33,174 @@ public class Tiger {
 	}
 
 	public void compile(String fname) {
-		System.out.println("--------enter compile ");
 		// /////////////////////////////////////////////////////
 		// to test the pretty printer on the "test/Fac.java" program
+		this.testFac();
+
+		if (fname == null) {
+			cmd.usage();
+			return;
+		}
+
+		// /////////////////////////////////////////////////////
+		// it would be helpful to be able to test the lexer
+		// independently.
+		this.testLexer(fname);
+		Control.fileName = fname.substring(fname.lastIndexOf("/") + 1);
+		// Lexer and Parser , then the AST is generated;
+		control.CompilerPass lexAndParsePass = new control.CompilerPass(
+				"Lex and parse", tiger, fname);
+		lexAndParsePass.doitName("lexAndParse");
+
+		// pretty printing the AST, if necessary
+		if (control.Control.dumpAst) {
+			ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
+			control.CompilerPass ppAstPass = new control.CompilerPass(
+					"Pretty printing the AST", theAst, pp);
+			ppAstPass.doit();
+		}
+
+		// elaborate the AST, report all possible errors.
+		elaborator.ElaboratorVisitor elab = new elaborator.ElaboratorVisitor();
+		control.CompilerPass elabAstPass = new control.CompilerPass(
+				"Elaborating the AST", theAst, elab);
+		elabAstPass.doit();
+
+		// optimize the AST
+		ast.optimizations.Main optAST = new ast.optimizations.Main();
+		control.CompilerPass optAstPass = new control.CompilerPass(
+				"Optimizing the AST", optAST, theAst);
+		optAstPass.doit();
+		theAst = optAST.program;
+
+		// translate to cAST
+		codegen.C.TranslateVisitor transC = new codegen.C.TranslateVisitor();
+		control.CompilerPass genCCodePass = new control.CompilerPass(
+				"C code generation", theAst, transC);
+		genCCodePass.doit();
+		codegen.C.program.T cAst = transC.program;
+
+		// translation to control-flow graph
+		cfg.TranslateVisitor transCfg = new cfg.TranslateVisitor();
+		control.CompilerPass genCfgCodePass = new control.CompilerPass(
+				"Control-flow graph generation", cAst, transCfg);
+		genCfgCodePass.doit();
+		cfg.program.T cfgAst = transCfg.program;
+
+		// visualize the control-flow graph, if necessary
+		if (control.Control.visualize != Control.Visualize_Kind_t.None) {
+			cfg.VisualVisitor toDot = new cfg.VisualVisitor();
+			control.CompilerPass genDotPass = new control.CompilerPass(
+					"Draw control-flow graph", cfgAst, toDot);
+			genDotPass.doit();
+		}
+
+		// optimizations on the control-flow graph
+		cfg.optimizations.Main cfgOpts = new cfg.optimizations.Main();
+		control.CompilerPass cfgOptPass = new control.CompilerPass(
+				"Control-flow graph optimizations", cfgOpts, cfgAst);
+		cfgOptPass.doit();
+
+		// code generation
+		codegen.bytecode.PrettyPrintVisitor ppbc = null;
+		codegen.C.PrettyPrintVisitor ppc = null;
+		switch (control.Control.codegen) {
+		case Bytecode:
+			codegen.bytecode.TranslateVisitor trans = new codegen.bytecode.TranslateVisitor();
+			control.CompilerPass genBytecodePass = new control.CompilerPass(
+					"Bytecode generation", theAst, trans);
+			genBytecodePass.doit();
+			codegen.bytecode.program.T bytecodeAst = trans.program;
+
+			ppbc = new codegen.bytecode.PrettyPrintVisitor();
+			control.CompilerPass ppBytecodePass = new control.CompilerPass(
+					"Bytecode printing", bytecodeAst, ppbc);
+			ppBytecodePass.doit();
+			break;
+		case C:
+			// generate cAST code;
+			ppc = new codegen.C.PrettyPrintVisitor();
+			control.CompilerPass ppCCodePass = new control.CompilerPass(
+					"C code printing", cAst, ppc);
+			ppCCodePass.doit();
+
+			// generate cfgAST code;
+			cfg.PrettyPrintVisitor ppCfg = new cfg.PrettyPrintVisitor();
+			control.CompilerPass ppCfgCodePass = new control.CompilerPass(
+					"C code printing", cfgAst, ppCfg);
+			ppCfgCodePass.doit();
+
+			break;
+		case Dalvik:
+			codegen.dalvik.TranslateVisitor transDalvik = new codegen.dalvik.TranslateVisitor();
+			control.CompilerPass genDalvikCodePass = new control.CompilerPass(
+					"Dalvik code generation", theAst, transDalvik);
+			genDalvikCodePass.doit();
+			codegen.dalvik.program.T dalvikAst = transDalvik.program;
+
+			codegen.dalvik.PrettyPrintVisitor ppDalvik = new codegen.dalvik.PrettyPrintVisitor();
+			control.CompilerPass ppDalvikCodePass = new control.CompilerPass(
+					"Dalvik code printing", dalvikAst, ppDalvik);
+			ppDalvikCodePass.doit();
+			break;
+		case X86:
+			// similar
+			break;
+		default:
+			break;
+		}
+
+		// Lab3, exercise 6: add some glue code to
+		// call gcc to compile the generated C or x86
+		// file, or call java to run the bytecode file.
+		// Your code:
+
+	}
+
+	public void assemble(String str) {
+		// Your code here:
+		// System.out.println("-------enter assemble");
+	}
+
+	public void link(String str) {
+		// Your code here:
+		// System.out.println("-------enter link");
+
+	}
+
+	public void compileAndLink(String fname) {
+		// compile
+		control.CompilerPass compilePass = new control.CompilerPass("Compile",
+				tiger, fname);
+		compilePass.doitName("compile");
+
+		// assembling
+		control.CompilerPass assemblePass = new control.CompilerPass(
+				"Assembling", tiger, fname);
+		assemblePass.doitName("assemble");
+
+		// linking
+		control.CompilerPass linkPass = new control.CompilerPass("Linking",
+				tiger, fname);
+		linkPass.doitName("link");
+
+		return;
+	}
+
+	public static void main(String[] args) {
+		// ///////////////////////////////////////////////////////
+		// handle command line arguments
+		tiger = new Tiger();
+		cmd = new CommandLine();
+		String fname = "";
+		fname = cmd.scan(args);
+		control.CompilerPass tigerAll = new control.CompilerPass("Tiger",
+				tiger, fname);
+		tigerAll.doitName("compileAndLink");
+		return;
+	}
+
+	public void testFac() {
 		if (control.Control.testFac) {
 			System.out.println("-------enter testFac");
 
@@ -54,11 +217,11 @@ public class Tiger {
 			elabPass.doit();
 
 			// optimize the AST
-			ast.optimizations.Main optAstPasses = new ast.optimizations.Main();
+			ast.optimizations.Main optAST = new ast.optimizations.Main();
 			control.CompilerPass optAstPass = new control.CompilerPass(
-					"Optimizing AST", optAstPasses, ast.Fac.prog);
+					"Optimizing AST", optAST, ast.Fac.prog);
 			optAstPass.doit();
-			ast.Fac.prog = (ast.program.Program) optAstPasses.program;
+			ast.Fac.prog = (ast.program.Program) optAST.program;
 
 			// Compile this program to C.
 			codegen.C.TranslateVisitor transC = new codegen.C.TranslateVisitor();
@@ -135,15 +298,9 @@ public class Tiger {
 			}
 			return;
 		}
+	}
 
-		if (fname == null) {
-			cmd.usage();
-			return;
-		}
-		Control.fileName = fname.substring(fname.lastIndexOf("/") + 1);
-		// /////////////////////////////////////////////////////
-		// it would be helpful to be able to test the lexer
-		// independently.
+	public void testLexer(String fname) {
 		if (control.Control.testlexer) {
 			System.out.println("Testing the lexer. All tokens:");
 			try {
@@ -160,153 +317,5 @@ public class Tiger {
 			}
 			System.exit(1);
 		}
-
-		control.CompilerPass lexAndParsePass = new control.CompilerPass(
-				"Lex and parse", tiger, fname);
-		lexAndParsePass.doitName("lexAndParse");
-
-		// pretty printing the AST, if necessary
-		if (control.Control.dumpAst) {
-			ast.PrettyPrintVisitor pp = new ast.PrettyPrintVisitor();
-			control.CompilerPass ppAstPass = new control.CompilerPass(
-					"Pretty printing the AST", theAst, pp);
-			ppAstPass.doit();
-		}
-
-		// elaborate the AST, report all possible errors.
-		elaborator.ElaboratorVisitor elab = new elaborator.ElaboratorVisitor();
-		control.CompilerPass elabAstPass = new control.CompilerPass(
-				"Elaborating the AST", theAst, elab);
-		elabAstPass.doit();
-
-		// optimize the AST
-		ast.optimizations.Main optAST = new ast.optimizations.Main();
-		control.CompilerPass optAstPass = new control.CompilerPass(
-				"Optimizing the AST", optAST, theAst);
-		optAstPass.doit();
-		theAst = optAST.program;
-
-		codegen.bytecode.PrettyPrintVisitor ppbc = null;
-		codegen.C.PrettyPrintVisitor ppc = null;
-		// code generation
-		switch (control.Control.codegen) {
-		case Bytecode:
-			codegen.bytecode.TranslateVisitor trans = new codegen.bytecode.TranslateVisitor();
-			control.CompilerPass genBytecodePass = new control.CompilerPass(
-					"Bytecode generation", theAst, trans);
-			genBytecodePass.doit();
-			codegen.bytecode.program.T bytecodeAst = trans.program;
-
-			ppbc = new codegen.bytecode.PrettyPrintVisitor();
-			control.CompilerPass ppBytecodePass = new control.CompilerPass(
-					"Bytecode printing", bytecodeAst, ppbc);
-			ppBytecodePass.doit();
-			break;
-		case C:
-			codegen.C.TranslateVisitor transC = new codegen.C.TranslateVisitor();
-			control.CompilerPass genCCodePass = new control.CompilerPass(
-					"C code generation", theAst, transC);
-			genCCodePass.doit();
-			codegen.C.program.T cAst = transC.program;
-
-			ppc = new codegen.C.PrettyPrintVisitor();
-			control.CompilerPass ppCCodePass = new control.CompilerPass(
-					"C code printing", cAst, ppc);
-			ppCCodePass.doit();
-			break;
-		case Dalvik:
-			codegen.dalvik.TranslateVisitor transDalvik = new codegen.dalvik.TranslateVisitor();
-			control.CompilerPass genDalvikCodePass = new control.CompilerPass(
-					"Dalvik code generation", theAst, transDalvik);
-			genDalvikCodePass.doit();
-			codegen.dalvik.program.T dalvikAst = transDalvik.program;
-
-			codegen.dalvik.PrettyPrintVisitor ppDalvik = new codegen.dalvik.PrettyPrintVisitor();
-			control.CompilerPass ppDalvikCodePass = new control.CompilerPass(
-					"Dalvik code printing", dalvikAst, ppDalvik);
-			ppDalvikCodePass.doit();
-			break;
-		case X86:
-			// similar
-			break;
-		default:
-			break;
-		}
-
-		// Lab3, exercise 6: add some glue code to
-		// call gcc to compile the generated C or x86
-		// file, or call java to run the bytecode file.
-		// Your code:
-		Runtime run = Runtime.getRuntime();
-		if (control.Control.codegen == Codegen_Kind_t.C) {
-			try {
-				String file = "test/ccodeTest/" + Control.fileName;
-				run.exec("gcc " + file + ".c  runtime/runtime.c -o " + file
-						+ ".exe");
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return;
-		} else if (control.Control.codegen == Codegen_Kind_t.Bytecode) {
-			try {
-				for (int i = 0; i < ppbc.jNames.size(); i++) {
-					run.exec("java -jar jasmin.jar " + ppbc.jNames.get(i)
-							+ " -d test/bytecodeTest");
-				}
-				// String[] ss=ppbc.jNames.get(0).split("\\.");
-				// the regex . can present any character,so use "\\."
-				// run.exec("java " + ppbc.jNames.get(0).split("\\.")[0]);
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		}
-	}
-
-	public void assemble(String str) {
-		// Your code here:
-		System.out.println("-------enter assemble");
-	}
-
-	public void link(String str) {
-		// Your code here:
-		System.out.println("-------enter link");
-	}
-
-	public void compileAndLink(String fname) {
-		System.out.println("-------enter compileAndlink");
-
-		// compile
-		control.CompilerPass compilePass = new control.CompilerPass("Compile",
-				tiger, fname);
-		compilePass.doitName("compile");
-
-		// assembling
-		control.CompilerPass assemblePass = new control.CompilerPass(
-				"Assembling", tiger, fname);
-		assemblePass.doitName("assemble");
-
-		// linking
-		control.CompilerPass linkPass = new control.CompilerPass("Linking",
-				tiger, fname);
-		linkPass.doitName("link");
-
-		return;
-	}
-
-	public static void main(String[] args) {
-		// ///////////////////////////////////////////////////////
-		// handle command line arguments
-		tiger = new Tiger();
-		cmd = new CommandLine();
-		String fname = "";
-		fname = cmd.scan(args);
-		// fname="test/DeadClass.java";
-		// Control.trace.add("ast.DeadClass");
-		control.CompilerPass tigerAll = new control.CompilerPass("Tiger",
-				tiger, fname);
-		tigerAll.doitName("compileAndLink");
-		return;
 	}
 }

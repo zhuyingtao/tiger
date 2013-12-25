@@ -260,7 +260,7 @@ public class PrettyPrintVisitor implements Visitor {
 	@Override
 	public void visit(codegen.bytecode.mainClass.MainClass c) {
 		// Every class must go into its own class file.
-		String fname = "test/bytecodeTest/" + c.id + ".j";
+		String fname = "test/byteCode/" + c.id + ".j";
 		try {
 			this.writer = new java.io.BufferedWriter(
 					new java.io.OutputStreamWriter(

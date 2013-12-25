@@ -1,139 +1,158 @@
 package cfg.optimizations;
 
-public class CopyProp implements cfg.Visitor
-{
-  public cfg.program.T program;
-  
-  public CopyProp()
-  {
-    this.program = null;
-  } 
+import cfg.stm.And;
+import cfg.stm.ArraySelect;
+import cfg.stm.Length;
+import cfg.stm.MoveArray;
+import cfg.stm.NewIntArray;
+import cfg.stm.Not;
 
-  // /////////////////////////////////////////////////////
-  // operand
-  @Override
-  public void visit(cfg.operand.Int operand)
-  {
-  }
+public class CopyProp implements cfg.Visitor {
+	public cfg.program.T program;
 
-  @Override
-  public void visit(cfg.operand.Var operand)
-  {
-  }
+	public CopyProp() {
+		this.program = null;
+	}
 
-  // statements
-  @Override
-  public void visit(cfg.stm.Add s)
-  {
-  }
+	// /////////////////////////////////////////////////////
+	// operand
+	@Override
+	public void visit(cfg.operand.Int operand) {
+	}
 
-  @Override
-  public void visit(cfg.stm.InvokeVirtual s)
-  {
-  }
+	@Override
+	public void visit(cfg.operand.Var operand) {
+	}
 
-  @Override
-  public void visit(cfg.stm.Lt s)
-  {
-  }
+	// statements
+	@Override
+	public void visit(cfg.stm.Add s) {
+	}
 
-  @Override
-  public void visit(cfg.stm.Move s)
-  {
-  }
+	@Override
+	public void visit(cfg.stm.InvokeVirtual s) {
+	}
 
-  @Override
-  public void visit(cfg.stm.NewObject s)
-  {
-  }
+	@Override
+	public void visit(cfg.stm.Lt s) {
+	}
 
-  @Override
-  public void visit(cfg.stm.Print s)
-  {
-  }
+	@Override
+	public void visit(cfg.stm.Move s) {
+	}
 
-  @Override
-  public void visit(cfg.stm.Sub s)
-  {
-  }
+	@Override
+	public void visit(cfg.stm.NewObject s) {
+	}
 
-  @Override
-  public void visit(cfg.stm.Times s)
-  {
-  }
+	@Override
+	public void visit(cfg.stm.Print s) {
+	}
 
-  // transfer
-  @Override
-  public void visit(cfg.transfer.If s)
-  {
-  }
+	@Override
+	public void visit(cfg.stm.Sub s) {
+	}
 
-  @Override
-  public void visit(cfg.transfer.Goto s)
-  {
-  }
+	@Override
+	public void visit(cfg.stm.Times s) {
+	}
 
-  @Override
-  public void visit(cfg.transfer.Return s)
-  {
-  }
+	// transfer
+	@Override
+	public void visit(cfg.transfer.If s) {
+	}
 
-  // type
-  @Override
-  public void visit(cfg.type.Class t)
-  {
-  }
+	@Override
+	public void visit(cfg.transfer.Goto s) {
+	}
 
-  @Override
-  public void visit(cfg.type.Int t)
-  {
-  }
+	@Override
+	public void visit(cfg.transfer.Return s) {
+	}
 
-  @Override
-  public void visit(cfg.type.IntArray t)
-  {
-  }
+	// type
+	@Override
+	public void visit(cfg.type.Class t) {
+	}
 
-  // dec
-  @Override
-  public void visit(cfg.dec.Dec d)
-  {
-  }
+	@Override
+	public void visit(cfg.type.Int t) {
+	}
 
-  // block
-  @Override
-  public void visit(cfg.block.Block b)
-  {
-  }
+	@Override
+	public void visit(cfg.type.IntArray t) {
+	}
 
-  // method
-  @Override
-  public void visit(cfg.method.Method m)
-  {
-  }
+	// dec
+	@Override
+	public void visit(cfg.dec.Dec d) {
+	}
 
-  @Override
-  public void visit(cfg.mainMethod.MainMethod m)
-  {
-  }
+	// block
+	@Override
+	public void visit(cfg.block.Block b) {
+	}
 
-  // vtables
-  @Override
-  public void visit(cfg.vtable.Vtable v)
-  {
-  }
+	// method
+	@Override
+	public void visit(cfg.method.Method m) {
+	}
 
-  // class
-  @Override
-  public void visit(cfg.classs.Class c)
-  {
-  }
+	@Override
+	public void visit(cfg.mainMethod.MainMethod m) {
+	}
 
-  // program
-  @Override
-  public void visit(cfg.program.Program p)
-  {
-    this.program = p;
-  }
+	// vtables
+	@Override
+	public void visit(cfg.vtable.Vtable v) {
+	}
 
+	// class
+	@Override
+	public void visit(cfg.classs.Class c) {
+	}
+
+	// program
+	@Override
+	public void visit(cfg.program.Program p) {
+		this.program = p;
+	}
+
+	@Override
+	public void visit(And and) {
+		// TODO Auto-generated method stub
+
+	}
+
+	@Override
+	public void visit(ArraySelect arraySelect) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(Length length) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(NewIntArray newIntArray) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(Not not) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void visit(MoveArray moveArray) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	
 }

@@ -1,77 +1,77 @@
 The Java Heap init info :
 ----the heapSize : 1024
-----the 'from' pointer : 0x00020D40
-----the 'fromFree' pointer : 0x00020D40
-----the 'to' pointer : 0x00020F40
+----the 'from' pointer : 0x005E0C90
+----the 'fromFree' pointer : 0x005E0C90
+----the 'to' pointer : 0x005E0E90
 
 
 The new object info :
 ----the rest size of Heap : 512
 ----the needed size of this object : 16
 ----the 'vptr' pointer : 0x00406004
-----the 'fromFree' pointer : 0x00020D50
+----the 'fromFree' pointer : 0x005E0CA0
 
 
 The new object info :
 ----the rest size of Heap : 496
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020D78
+----the 'fromFree' pointer : 0x005E0CC8
 
 
 The new object info :
 ----the rest size of Heap : 456
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020DA0
+----the 'fromFree' pointer : 0x005E0CF0
 
 
 The new object info :
 ----the rest size of Heap : 416
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020DC8
+----the 'fromFree' pointer : 0x005E0D18
 
 
 The new object info :
 ----the rest size of Heap : 376
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020DF0
+----the 'fromFree' pointer : 0x005E0D40
 
 
 The new object info :
 ----the rest size of Heap : 336
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020E18
+----the 'fromFree' pointer : 0x005E0D68
 
 
 The new object info :
 ----the rest size of Heap : 296
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020E40
+----the 'fromFree' pointer : 0x005E0D90
 
 
 The new object info :
 ----the rest size of Heap : 256
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020E68
+----the 'fromFree' pointer : 0x005E0DB8
 
 
 The new object info :
 ----the rest size of Heap : 216
 ----the needed size of this object : 40
 ----the 'vptr' pointer : 0x00406020
-----the 'fromFree' pointer : 0x00020E90
+----the 'fromFree' pointer : 0x005E0DE0
 
 
 The new object info :
 ----the rest size of Heap : 176
 ----the needed size of this object : 24
 ----the 'vptr' pointer : 0x00406080
-----the 'fromFree' pointer : 0x00020EA8
+----the 'fromFree' pointer : 0x005E0DF8
 
 
